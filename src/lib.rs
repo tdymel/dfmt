@@ -3,7 +3,7 @@
 /*
 TODO:
 - Write documentation with examples
-- Write Tests
+- Write Tests (Also test non ascii templates)
 - Write Benchmarks
 - Implement and test no_std support
 
@@ -16,8 +16,6 @@ TODO:
 - Rename internal macros, such that they are not easily found
 
 - Add an API with the specialization feature
-
-- Instead of Option<Precision> add another enum value
 
 - Finalize Readme
 

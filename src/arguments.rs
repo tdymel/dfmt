@@ -77,22 +77,21 @@ impl<'ct> Arguments<'ct> {
 
                     let dynamic_width = if let Some(specifier) = specifier {
                         match &specifier.width {
-                            Width::Dynamic(key) => self.find_argument_value(key)?.to_usize(),
-                            Width::Fixed(amount) => *amount,
+                            Width::Dynamic(key) => self.find_argument_value(key)?.to_u16(),
+                            Width::Fixed(amount) => Some(*amount),
                         }
                     } else {
-                        0
+                        None
                     };
 
-                    let dynamic_precision = if let Some(specifier) = specifier
-                        && let Some(precision) = &specifier.precision
-                    {
-                        match precision {
-                            Precision::Dynamic(key) => self.find_argument_value(key)?.to_usize(),
-                            Precision::Fixed(amount) => *amount,
+                    let dynamic_precision = if let Some(specifier) = specifier {
+                        match &specifier.precision {
+                            Precision::Dynamic(key) => self.find_argument_value(key)?.to_u16(),
+                            Precision::Fixed(amount) => Some(*amount),
+                            Precision::Auto => None,
                         }
                     } else {
-                        0
+                        None
                     };
 
                     write_argument_value(
@@ -174,14 +173,14 @@ fn write_argument_value(
     output: &mut String,
     specifier: Option<&Specifier>,
     value: &TypedValue<'_>,
-    width: usize,
-    precision: usize,
+    width: Option<u16>,
+    precision: Option<u16>,
 ) -> core::fmt::Result {
     if let Some(specifier) = specifier {
         let mut formatter = specifier
             .formatting_options()
-            .width(Some(width as u16))
-            .precision(Some(precision as u16))
+            .width(width)
+            .precision(precision)
             .create_formatter(output);
         core::fmt::Display::fmt(value, &mut formatter)
     } else {
@@ -194,8 +193,8 @@ fn write_argument_value(
     output: &mut String,
     specifier: Option<&Specifier>,
     value: &TypedValue<'_>,
-    width: usize,
-    precision: usize,
+    width: Option<u16>,
+    precision: Option<u16>,
 ) -> core::fmt::Result {
     if let Some(specifier) = specifier {
         let result = match (
@@ -205,189 +204,397 @@ fn write_argument_value(
             specifier.pad_zero,
             &specifier.precision,
         ) {
-            (None, true, true, true, None) => write!(output, "{:+#0w$}", value, w = width),
-            (None, true, true, true, Some(_)) => {
-                write!(output, "{:+#0w$.p$}", value, w = width, p = precision)
+            (Alignment::Auto, true, true, true, Precision::Auto) => {
+                write!(output, "{:+#0w$}", value, w = width.unwrap() as usize)
             }
-            (None, true, true, false, None) => write!(output, "{:+#w$}", value, w = width),
-            (None, true, true, false, Some(_)) => {
-                write!(output, "{:+#w$.p$}", value, w = width, p = precision)
+            (Alignment::Auto, true, true, true, _) => {
+                write!(
+                    output,
+                    "{:+#0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (None, true, false, true, None) => write!(output, "{:+0w$}", value, w = width),
-            (None, true, false, true, Some(_)) => {
-                write!(output, "{:+0w$.p$}", value, w = width, p = precision)
+            (Alignment::Auto, true, true, false, Precision::Auto) => {
+                write!(output, "{:+#w$}", value, w = width.unwrap() as usize)
             }
-            (None, true, false, false, None) => write!(output, "{:+#w$}", value, w = width),
-            (None, true, false, false, Some(_)) => {
-                write!(output, "{:+w$.p$}", value, w = width, p = precision)
+            (Alignment::Auto, true, true, false, _) => {
+                write!(
+                    output,
+                    "{:+#w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (None, false, true, true, None) => write!(output, "{:#0w$}", value, w = width),
-            (None, false, true, true, Some(_)) => {
-                write!(output, "{:#0w$.p$}", value, w = width, p = precision)
+            (Alignment::Auto, true, false, true, Precision::Auto) => {
+                write!(output, "{:+0w$}", value, w = width.unwrap() as usize)
             }
-            (None, false, true, false, None) => write!(output, "{:#w$}", value, w = width),
-            (None, false, true, false, Some(_)) => {
-                write!(output, "{:#w$.p$}", value, w = width, p = precision)
+            (Alignment::Auto, true, false, true, _) => {
+                write!(
+                    output,
+                    "{:+0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (None, false, false, true, None) => write!(output, "{:0w$}", value, w = width),
-            (None, false, false, true, Some(_)) => {
-                write!(output, "{:0w$.p$}", value, w = width, p = precision)
+            (Alignment::Auto, true, false, false, Precision::Auto) => {
+                write!(output, "{:+#w$}", value, w = width.unwrap() as usize)
             }
-            (None, false, false, false, None) => write!(output, "{:w$}", value, w = width),
-            (None, false, false, false, Some(_)) => {
-                write!(output, "{:w$.p$}", value, w = width, p = precision)
+            (Alignment::Auto, true, false, false, _) => {
+                write!(
+                    output,
+                    "{:+w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-
-            (Some(Alignment::Left), true, true, true, None) => {
-                write!(output, "{:ꙮ<+#0w$}", value, w = width)
+            (Alignment::Auto, false, true, true, Precision::Auto) => {
+                write!(output, "{:#0w$}", value, w = width.unwrap() as usize)
             }
-            (Some(Alignment::Left), true, true, true, Some(_)) => {
-                write!(output, "{:ꙮ<+#0w$.p$}", value, w = width, p = precision)
+            (Alignment::Auto, false, true, true, _) => {
+                write!(
+                    output,
+                    "{:#0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (Some(Alignment::Left), true, true, false, None) => {
-                write!(output, "{:ꙮ<+#w$}", value, w = width)
+            (Alignment::Auto, false, true, false, Precision::Auto) => {
+                write!(output, "{:#w$}", value, w = width.unwrap() as usize)
             }
-            (Some(Alignment::Left), true, true, false, Some(_)) => {
-                write!(output, "{:ꙮ<+#w$.p$}", value, w = width, p = precision)
+            (Alignment::Auto, false, true, false, _) => {
+                write!(
+                    output,
+                    "{:#w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (Some(Alignment::Left), true, false, true, None) => {
-                write!(output, "{:ꙮ<+0w$}", value, w = width)
+            (Alignment::Auto, false, false, true, Precision::Auto) => {
+                write!(output, "{:0w$}", value, w = width.unwrap() as usize)
             }
-            (Some(Alignment::Left), true, false, true, Some(_)) => {
-                write!(output, "{:ꙮ<+0w$.p$}", value, w = width, p = precision)
+            (Alignment::Auto, false, false, true, _) => {
+                write!(
+                    output,
+                    "{:0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (Some(Alignment::Left), true, false, false, None) => {
-                write!(output, "{:ꙮ<+#w$}", value, w = width)
+            (Alignment::Auto, false, false, false, Precision::Auto) => {
+                write!(output, "{:w$}", value, w = width.unwrap() as usize)
             }
-            (Some(Alignment::Left), true, false, false, Some(_)) => {
-                write!(output, "{:ꙮ<+w$.p$}", value, w = width, p = precision)
-            }
-            (Some(Alignment::Left), false, true, true, None) => {
-                write!(output, "{:ꙮ<#0w$}", value, w = width)
-            }
-            (Some(Alignment::Left), false, true, true, Some(_)) => {
-                write!(output, "{:ꙮ<#0w$.p$}", value, w = width, p = precision)
-            }
-            (Some(Alignment::Left), false, true, false, None) => {
-                write!(output, "{:ꙮ<#w$}", value, w = width)
-            }
-            (Some(Alignment::Left), false, true, false, Some(_)) => {
-                write!(output, "{:ꙮ<#w$.p$}", value, w = width, p = precision)
-            }
-            (Some(Alignment::Left), false, false, true, None) => {
-                write!(output, "{:ꙮ<0w$}", value, w = width)
-            }
-            (Some(Alignment::Left), false, false, true, Some(_)) => {
-                write!(output, "{:ꙮ<0w$.p$}", value, w = width, p = precision)
-            }
-            (Some(Alignment::Left), false, false, false, None) => {
-                write!(output, "{:ꙮ<w$}", value, w = width)
-            }
-            (Some(Alignment::Left), false, false, false, Some(_)) => {
-                write!(output, "{:ꙮ<w$.p$}", value, w = width, p = precision)
-            }
-
-            (Some(Alignment::Center), true, true, true, None) => {
-                write!(output, "{:ꙮ^+#0w$}", value, w = width)
-            }
-            (Some(Alignment::Center), true, true, true, Some(_)) => {
-                write!(output, "{:ꙮ^+#0w$.p$}", value, w = width, p = precision)
-            }
-            (Some(Alignment::Center), true, true, false, None) => {
-                write!(output, "{:ꙮ^+#w$}", value, w = width)
-            }
-            (Some(Alignment::Center), true, true, false, Some(_)) => {
-                write!(output, "{:ꙮ^+#w$.p$}", value, w = width, p = precision)
-            }
-            (Some(Alignment::Center), true, false, true, None) => {
-                write!(output, "{:ꙮ^+0w$}", value, w = width)
-            }
-            (Some(Alignment::Center), true, false, true, Some(_)) => {
-                write!(output, "{:ꙮ^+0w$.p$}", value, w = width, p = precision)
-            }
-            (Some(Alignment::Center), true, false, false, None) => {
-                write!(output, "{:ꙮ^+#w$}", value, w = width)
-            }
-            (Some(Alignment::Center), true, false, false, Some(_)) => {
-                write!(output, "{:ꙮ^+w$.p$}", value, w = width, p = precision)
-            }
-            (Some(Alignment::Center), false, true, true, None) => {
-                write!(output, "{:ꙮ^#0w$}", value, w = width)
-            }
-            (Some(Alignment::Center), false, true, true, Some(_)) => {
-                write!(output, "{:ꙮ^#0w$.p$}", value, w = width, p = precision)
-            }
-            (Some(Alignment::Center), false, true, false, None) => {
-                write!(output, "{:ꙮ^#w$}", value, w = width)
-            }
-            (Some(Alignment::Center), false, true, false, Some(_)) => {
-                write!(output, "{:ꙮ^#w$.p$}", value, w = width, p = precision)
-            }
-            (Some(Alignment::Center), false, false, true, None) => {
-                write!(output, "{:ꙮ^0w$}", value, w = width)
-            }
-            (Some(Alignment::Center), false, false, true, Some(_)) => {
-                write!(output, "{:ꙮ^0w$.p$}", value, w = width, p = precision)
-            }
-            (Some(Alignment::Center), false, false, false, None) => {
-                write!(output, "{:ꙮ^w$}", value, w = width)
-            }
-            (Some(Alignment::Center), false, false, false, Some(_)) => {
-                write!(output, "{:ꙮ^w$.p$}", value, w = width, p = precision)
+            (Alignment::Auto, false, false, false, _) => {
+                write!(
+                    output,
+                    "{:w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
 
-            (Some(Alignment::Right), true, true, true, None) => {
-                write!(output, "{:ꙮ>+#0w$}", value, w = width)
+            (Alignment::Left, true, true, true, Precision::Auto) => {
+                write!(output, "{:ꙮ<+#0w$}", value, w = width.unwrap() as usize)
             }
-            (Some(Alignment::Right), true, true, true, Some(_)) => {
-                write!(output, "{:ꙮ>+#0w$.p$}", value, w = width, p = precision)
+            (Alignment::Left, true, true, true, _) => {
+                write!(
+                    output,
+                    "{:ꙮ<+#0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (Some(Alignment::Right), true, true, false, None) => {
-                write!(output, "{:ꙮ>+#w$}", value, w = width)
+            (Alignment::Left, true, true, false, Precision::Auto) => {
+                write!(output, "{:ꙮ<+#w$}", value, w = width.unwrap() as usize)
             }
-            (Some(Alignment::Right), true, true, false, Some(_)) => {
-                write!(output, "{:ꙮ>+#w$.p$}", value, w = width, p = precision)
+            (Alignment::Left, true, true, false, _) => {
+                write!(
+                    output,
+                    "{:ꙮ<+#w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (Some(Alignment::Right), true, false, true, None) => {
-                write!(output, "{:ꙮ>+0w$}", value, w = width)
+            (Alignment::Left, true, false, true, Precision::Auto) => {
+                write!(output, "{:ꙮ<+0w$}", value, w = width.unwrap() as usize)
             }
-            (Some(Alignment::Right), true, false, true, Some(_)) => {
-                write!(output, "{:ꙮ>+0w$.p$}", value, w = width, p = precision)
+            (Alignment::Left, true, false, true, _) => {
+                write!(
+                    output,
+                    "{:ꙮ<+0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (Some(Alignment::Right), true, false, false, None) => {
-                write!(output, "{:ꙮ>+#w$}", value, w = width)
+            (Alignment::Left, true, false, false, Precision::Auto) => {
+                write!(output, "{:ꙮ<+#w$}", value, w = width.unwrap() as usize)
             }
-            (Some(Alignment::Right), true, false, false, Some(_)) => {
-                write!(output, "{:ꙮ>+w$.p$}", value, w = width, p = precision)
+            (Alignment::Left, true, false, false, _) => {
+                write!(
+                    output,
+                    "{:ꙮ<+w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (Some(Alignment::Right), false, true, true, None) => {
-                write!(output, "{:ꙮ>#0w$}", value, w = width)
+            (Alignment::Left, false, true, true, Precision::Auto) => {
+                write!(output, "{:ꙮ<#0w$}", value, w = width.unwrap() as usize)
             }
-            (Some(Alignment::Right), false, true, true, Some(_)) => {
-                write!(output, "{:ꙮ>#0w$.p$}", value, w = width, p = precision)
+            (Alignment::Left, false, true, true, _) => {
+                write!(
+                    output,
+                    "{:ꙮ<#0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (Some(Alignment::Right), false, true, false, None) => {
-                write!(output, "{:ꙮ>#w$}", value, w = width)
+            (Alignment::Left, false, true, false, Precision::Auto) => {
+                write!(output, "{:ꙮ<#w$}", value, w = width.unwrap() as usize)
             }
-            (Some(Alignment::Right), false, true, false, Some(_)) => {
-                write!(output, "{:ꙮ>#w$.p$}", value, w = width, p = precision)
+            (Alignment::Left, false, true, false, _) => {
+                write!(
+                    output,
+                    "{:ꙮ<#w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (Some(Alignment::Right), false, false, true, None) => {
-                write!(output, "{:ꙮ>0w$}", value, w = width)
+            (Alignment::Left, false, false, true, Precision::Auto) => {
+                write!(output, "{:ꙮ<0w$}", value, w = width.unwrap() as usize)
             }
-            (Some(Alignment::Right), false, false, true, Some(_)) => {
-                write!(output, "{:ꙮ>0w$.p$}", value, w = width, p = precision)
+            (Alignment::Left, false, false, true, _) => {
+                write!(
+                    output,
+                    "{:ꙮ<0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
-            (Some(Alignment::Right), false, false, false, None) => {
-                write!(output, "{:ꙮ>w$}", value, w = width)
+            (Alignment::Left, false, false, false, Precision::Auto) => {
+                write!(output, "{:ꙮ<w$}", value, w = width.unwrap() as usize)
             }
-            (Some(Alignment::Right), false, false, false, Some(_)) => {
-                write!(output, "{:ꙮ>w$.p$}", value, w = width, p = precision)
+            (Alignment::Left, false, false, false, _) => {
+                write!(
+                    output,
+                    "{:ꙮ<w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+
+            (Alignment::Center, true, true, true, Precision::Auto) => {
+                write!(output, "{:ꙮ^+#0w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Center, true, true, true, _) => {
+                write!(
+                    output,
+                    "{:ꙮ^+#0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Center, true, true, false, Precision::Auto) => {
+                write!(output, "{:ꙮ^+#w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Center, true, true, false, _) => {
+                write!(
+                    output,
+                    "{:ꙮ^+#w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Center, true, false, true, Precision::Auto) => {
+                write!(output, "{:ꙮ^+0w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Center, true, false, true, _) => {
+                write!(
+                    output,
+                    "{:ꙮ^+0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Center, true, false, false, Precision::Auto) => {
+                write!(output, "{:ꙮ^+#w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Center, true, false, false, _) => {
+                write!(
+                    output,
+                    "{:ꙮ^+w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Center, false, true, true, Precision::Auto) => {
+                write!(output, "{:ꙮ^#0w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Center, false, true, true, _) => {
+                write!(
+                    output,
+                    "{:ꙮ^#0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Center, false, true, false, Precision::Auto) => {
+                write!(output, "{:ꙮ^#w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Center, false, true, false, _) => {
+                write!(
+                    output,
+                    "{:ꙮ^#w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Center, false, false, true, Precision::Auto) => {
+                write!(output, "{:ꙮ^0w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Center, false, false, true, _) => {
+                write!(
+                    output,
+                    "{:ꙮ^0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Center, false, false, false, Precision::Auto) => {
+                write!(output, "{:ꙮ^w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Center, false, false, false, _) => {
+                write!(
+                    output,
+                    "{:ꙮ^w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+
+            (Alignment::Right, true, true, true, Precision::Auto) => {
+                write!(output, "{:ꙮ>+#0w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Right, true, true, true, _) => {
+                write!(
+                    output,
+                    "{:ꙮ>+#0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Right, true, true, false, Precision::Auto) => {
+                write!(output, "{:ꙮ>+#w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Right, true, true, false, _) => {
+                write!(
+                    output,
+                    "{:ꙮ>+#w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Right, true, false, true, Precision::Auto) => {
+                write!(output, "{:ꙮ>+0w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Right, true, false, true, _) => {
+                write!(
+                    output,
+                    "{:ꙮ>+0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Right, true, false, false, Precision::Auto) => {
+                write!(output, "{:ꙮ>+#w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Right, true, false, false, _) => {
+                write!(
+                    output,
+                    "{:ꙮ>+w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Right, false, true, true, Precision::Auto) => {
+                write!(output, "{:ꙮ>#0w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Right, false, true, true, _) => {
+                write!(
+                    output,
+                    "{:ꙮ>#0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Right, false, true, false, Precision::Auto) => {
+                write!(output, "{:ꙮ>#w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Right, false, true, false, _) => {
+                write!(
+                    output,
+                    "{:ꙮ>#w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Right, false, false, true, Precision::Auto) => {
+                write!(output, "{:ꙮ>0w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Right, false, false, true, _) => {
+                write!(
+                    output,
+                    "{:ꙮ>0w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
+            }
+            (Alignment::Right, false, false, false, Precision::Auto) => {
+                write!(output, "{:ꙮ>w$}", value, w = width.unwrap() as usize)
+            }
+            (Alignment::Right, false, false, false, _) => {
+                write!(
+                    output,
+                    "{:ꙮ>w$.p$}",
+                    value,
+                    w = width.unwrap() as usize,
+                    p = precision.unwrap() as usize
+                )
             }
         };
 
-        if specifier.alignment.is_some() && output.contains('ꙮ') {
-            *output = output.replace('ꙮ', &specifier.fill_character.unwrap_or(' ').to_string());
+        if specifier.alignment != Alignment::Auto && output.contains('ꙮ') {
+            *output = output.replace('ꙮ', &specifier.fill_character.to_string());
         }
 
         result

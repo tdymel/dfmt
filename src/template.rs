@@ -109,11 +109,12 @@ impl core::fmt::Display for Type {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Alignment {
     Left,
     Center,
     Right,
+    Auto,
 }
 
 impl core::fmt::Display for Alignment {
@@ -122,6 +123,7 @@ impl core::fmt::Display for Alignment {
             Alignment::Left => f.write_char('<'),
             Alignment::Center => f.write_char('^'),
             Alignment::Right => f.write_char('>'),
+            Alignment::Auto => Ok(()),
         }
     }
 }
@@ -129,7 +131,7 @@ impl core::fmt::Display for Alignment {
 #[derive(Debug, Clone)]
 pub enum Width {
     Dynamic(ArgumentKey), // something$
-    Fixed(usize),
+    Fixed(u16),
 }
 
 impl core::fmt::Display for Width {
@@ -146,19 +148,24 @@ impl core::fmt::Display for Width {
 
 #[derive(Debug, Clone)]
 pub enum Precision {
+    Auto,
     Dynamic(ArgumentKey), // .something$ or *
-    Fixed(usize),
+    Fixed(u16),
 }
 
 impl core::fmt::Display for Precision {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.write_char('.')?;
         match self {
             Precision::Dynamic(argument_key) => {
+                f.write_char('.')?;
                 write!(f, "{argument_key}")?;
                 f.write_char('$')
             }
-            Precision::Fixed(amount) => write!(f, "{amount}"),
+            Precision::Fixed(amount) => {
+                f.write_char('.')?;
+                write!(f, "{amount}")
+            }
+            Precision::Auto => Ok(()),
         }
     }
 }
@@ -167,12 +174,12 @@ impl core::fmt::Display for Precision {
 pub struct Specifier {
     pub ty: Type,
     pub alternate_form: bool,
-    pub fill_character: Option<char>, // Default: Space
-    pub alignment: Option<Alignment>,
+    pub fill_character: char,
+    pub alignment: Alignment,
     pub sign: bool,
     pub pad_zero: bool,
     pub width: Width,
-    pub precision: Option<Precision>,
+    pub precision: Precision,
 }
 
 #[cfg(feature = "nightly_formatting_options")]
@@ -180,12 +187,13 @@ impl Specifier {
     pub fn formatting_options(&self) -> core::fmt::FormattingOptions {
         let mut options = core::fmt::FormattingOptions::new();
         options
-            .fill(self.fill_character.unwrap_or(' '))
-            .align(self.alignment.map(|it| match it {
-                Alignment::Left => core::fmt::Alignment::Left,
-                Alignment::Right => core::fmt::Alignment::Right,
-                Alignment::Center => core::fmt::Alignment::Center,
-            }))
+            .fill(self.fill_character)
+            .align(match self.alignment {
+                Alignment::Left => Some(core::fmt::Alignment::Left),
+                Alignment::Right => Some(core::fmt::Alignment::Right),
+                Alignment::Center => Some(core::fmt::Alignment::Center),
+                Alignment::Auto => None,
+            })
             .sign(match self.sign {
                 true => Some(core::fmt::Sign::Plus),
                 false => None,
@@ -197,8 +205,8 @@ impl Specifier {
                 Width::Fixed(amount) => Some(amount as u16),
             })
             .precision(match self.precision {
-                Some(Precision::Dynamic(_)) | None => None,
-                Some(Precision::Fixed(amount)) => Some(amount as u16),
+                Precision::Dynamic(_) | Precision::Auto => None,
+                Precision::Fixed(amount) => Some(amount as u16),
             });
 
         options
@@ -209,25 +217,21 @@ impl<'a> Default for Specifier {
     fn default() -> Self {
         Self {
             ty: Type::Display,
-            alternate_form: Default::default(),
-            fill_character: Default::default(),
-            alignment: Default::default(),
-            sign: Default::default(),
-            pad_zero: Default::default(),
+            alternate_form: false,
+            fill_character: ' ',
+            alignment: Alignment::Auto,
+            sign: false,
+            pad_zero: false,
             width: Width::Fixed(0),
-            precision: Default::default(),
+            precision: Precision::Auto,
         }
     }
 }
 
 impl core::fmt::Display for Specifier {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        if let Some(fill_character) = self.fill_character {
-            write!(f, "{fill_character}")?;
-        }
-        if let Some(alignment) = self.alignment {
-            write!(f, "{alignment}")?;
-        }
+        write!(f, "{}", self.fill_character)?;
+        write!(f, "{}", self.alignment)?;
         if self.sign {
             f.write_char('+')?;
         }
@@ -238,9 +242,7 @@ impl core::fmt::Display for Specifier {
             f.write_char('0')?;
         }
         write!(f, "{}", self.width)?;
-        if let Some(precision) = &self.precision {
-            write!(f, "{precision}")?;
-        }
+        write!(f, "{}", self.precision)?;
         write!(f, "{}", self.ty)?;
 
         Ok(())

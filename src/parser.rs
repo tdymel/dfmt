@@ -47,24 +47,24 @@ pub fn parse_pieces(input: &str) -> Result<Vec<Piece>, Error> {
                         ) {
                             (char, b'<') | (char, b'^') | (char, b'>') => {
                                 current_specifier_index += 1;
-                                Some(char as char) // TODO: Test if this works with all kind of fill characters!
+                                char as char
                             }
-                            _ => None,
+                            _ => ' ',
                         };
                         let alignment = match chars[current_specifier_index] {
                             b'<' => {
                                 current_specifier_index += 1;
-                                Some(Alignment::Left)
+                                Alignment::Left
                             }
                             b'>' => {
                                 current_specifier_index += 1;
-                                Some(Alignment::Right)
+                                Alignment::Right
                             }
                             b'^' => {
                                 current_specifier_index += 1;
-                                Some(Alignment::Center)
+                                Alignment::Center
                             }
-                            _ => None,
+                            _ => Alignment::Auto,
                         };
                         let sign = match chars[current_specifier_index] {
                             b'+' => {
@@ -95,17 +95,13 @@ pub fn parse_pieces(input: &str) -> Result<Vec<Piece>, Error> {
                                 }
                                 let amount_str = &input[current_specifier_index..until_index];
                                 current_specifier_index = until_index;
-                                Width::Fixed(amount_str.parse::<usize>().unwrap())
+                                Width::Fixed(amount_str.parse::<u16>().unwrap())
                             } else if chars[current_specifier_index].is_ascii_alphabetic() {
                                 let end_index = current_specifier_index
                                     + input[current_specifier_index..current_char]
                                         .find('$')
                                         .unwrap();
 
-                                // let key = ArgumentKey::Name {
-                                //     start: current_specifier_index,
-                                //     end: end_index,
-                                // };
                                 let key = ArgumentKey::Name(
                                     input[current_specifier_index..end_index].to_string(),
                                 );
@@ -125,30 +121,26 @@ pub fn parse_pieces(input: &str) -> Result<Vec<Piece>, Error> {
                                 }
                                 let amount_str = &input[current_specifier_index..until_index];
                                 current_specifier_index = until_index;
-                                Some(Precision::Fixed(amount_str.parse::<usize>().unwrap()))
+                                Precision::Fixed(amount_str.parse::<u16>().unwrap())
                             } else if chars[current_specifier_index].is_ascii_alphabetic() {
                                 let end_index = current_specifier_index
                                     + input[current_specifier_index..current_char]
                                         .find('$')
                                         .unwrap();
 
-                                // let key = ArgumentKey::Name {
-                                //     start: current_specifier_index,
-                                //     end: end_index,
-                                // };
                                 let key = ArgumentKey::Name(
                                     input[current_specifier_index..end_index].to_string(),
                                 );
                                 current_specifier_index = end_index + 1;
-                                Some(Precision::Dynamic(key))
+                                Precision::Dynamic(key)
                             } else if chars[current_specifier_index] == b'*' {
                                 internal_index += 1;
-                                Some(Precision::Dynamic(ArgumentKey::Index(internal_index - 1)))
+                                Precision::Dynamic(ArgumentKey::Index(internal_index - 1))
                             } else {
                                 unreachable!()
                             }
                         } else {
-                            None
+                            Precision::Auto
                         };
                         let ty = match chars[current_specifier_index] {
                             b'?' => Type::Debug,

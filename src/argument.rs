@@ -21,14 +21,11 @@ pub enum ArgumentValue<'ct> {
 }
 
 impl<'ct> ArgumentValue<'ct> {
-    pub fn to_usize(&self) -> usize {
+    pub fn to_u16(&self) -> Option<u16> {
         match self {
             // TODO: Hacky, but it works for all relevant purposes
-            ArgumentValue::Display(value) => match value.to_string().parse::<usize>() {
-                Ok(amount) => amount,
-                Err(_) => 0,
-            },
-            _ => 0,
+            ArgumentValue::Display(value) => value.to_string().parse::<u16>().ok(),
+            _ => None,
         }
     }
 
