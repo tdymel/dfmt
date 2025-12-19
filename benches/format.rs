@@ -1,8 +1,6 @@
 use criterion::{Criterion, criterion_group, criterion_main};
+use dfmt::{ArgumentsBuilder, Template, UncheckedArgumentsBuilder, dformat, dformat_unchecked};
 use dyf::{FormatString, dformat as dyf_dformat};
-use dfmt::{
-    ArgumentsBuilder, Template, UncheckedArgumentsBuilder, dformat, dformat_unchecked,
-};
 
 #[derive(Debug)]
 pub struct TestStruct {
@@ -30,7 +28,7 @@ fn format_perf(c: &mut Criterion) {
     )
     .unwrap();
     let format_string = "This is a {{{0}}} {1} {2} {3} {4:?}.".to_string();
-    let compiled_template = Template::parse_str(format_string.as_str()).unwrap();
+    let compiled_template = Template::parse(format_string.as_str()).unwrap();
 
     let magic_number = 42;
     let float_number = 21.3;
@@ -40,8 +38,9 @@ fn format_perf(c: &mut Criterion) {
         hello: 32,
         world: 42,
     };
-    // c.bench_function("compile pest parser", |b| {
-    //     b.iter(|| Template::from(format_string.as_ref()));
+
+    // c.bench_function("Parse template", |b| {
+    //     b.iter(|| Template::parse(&format_string));
     // });
 
     // c.bench_function("parse_naive", |b| {

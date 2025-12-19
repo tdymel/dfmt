@@ -7,9 +7,6 @@ TODO:
 - Write Benchmarks
 - Implement and test no_std support
 
-- Add API to create Template directly and sidestep string based constructor and parser
-  - Guess we need another builder
-
 - Performance: The checking for add_argument_value adds overhead and the macro adds overhead by unwrapping these errors all the time.
   - Make a fully unchecked version of the macro that just panics but avoids these wrappings
 - Clean up files and pull things apart

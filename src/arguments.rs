@@ -62,14 +62,20 @@ impl<'ct> Arguments<'ct> {
 
     pub fn format(&self) -> Result<String, Error> {
         let mut result = String::with_capacity(
-            self.template.template.len() + self.template.pieces.iter().count() * 20,
+            self.template
+                .pieces
+                .iter()
+                .map(|piece| match piece {
+                    Piece::Literal(literal) => literal.len(),
+                    Piece::BracketOpen | Piece::BracketClose => 1,
+                    _ => 20,
+                })
+                .sum(),
         );
 
         for piece in &self.template.pieces {
             match piece {
-                Piece::Literal { start, end } => {
-                    result.push_str(&self.template.template[*start..*end])
-                }
+                Piece::Literal(literal) => result.push_str(&literal),
                 Piece::BracketOpen => result.push('{'),
                 Piece::BracketClose => result.push('}'),
                 Piece::Argument { key, specifier } => {

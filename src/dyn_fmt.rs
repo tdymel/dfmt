@@ -26,11 +26,11 @@ impl<K: ToArgumentKey> DynFmt<K> for Template {
 
 impl<K: ToArgumentKey> DynFmt<K> for &str {
     fn format(&self, argument_values: Vec<(K, ArgumentValue<'_>)>) -> Result<String, Error> {
-        Template::parse_str(self)?.format(argument_values)
+        Template::parse(self)?.format(argument_values)
     }
 
     fn format_unchecked(&self, argument_values: Vec<(K, ArgumentValue<'_>)>) -> String {
-        Template::parse_str(self)
+        Template::parse(self)
             .unwrap()
             .format_unchecked(argument_values)
     }

@@ -1,21 +1,16 @@
 use core::fmt::Write;
 
-use crate::{Arguments, argument::ArgumentKey, error::Error, parser::parse_pieces};
+use crate::{Arguments, ToArgumentKey, argument::ArgumentKey, error::Error, parser::parse_pieces};
 
 #[derive(Debug, Clone)]
 pub struct Template {
-    pub template: String,
     pub pieces: Vec<Piece>,
 }
 
 impl Template {
-    pub fn parse(template: String) -> Result<Self, Error> {
-        let pieces = parse_pieces(&template)?;
-        Ok(Self { template, pieces })
-    }
-
-    pub fn parse_str(template: &str) -> Result<Self, Error> {
-        Template::parse(template.to_owned())
+    pub fn parse(template: &str) -> Result<Self, Error> {
+        let pieces = parse_pieces(template)?;
+        Ok(Self { pieces })
     }
 
     pub fn arguments(&self) -> Arguments<'_> {
@@ -25,43 +20,66 @@ impl Template {
     pub fn to_template(&self) -> &Template {
         self
     }
+
+    pub fn literal<V: ToString>(mut self, literal: V) -> Self {
+        self.pieces.push(Piece::Literal(literal.to_string()));
+        self
+    }
+
+    pub fn specified_argument<K: ToArgumentKey>(mut self, key: K, specifier: Specifier) -> Self {
+        self.pieces.push(Piece::Argument {
+            key: key.to_argument_key(),
+            specifier: Some(specifier),
+        });
+        self
+    }
+
+    pub fn argument<K: ToArgumentKey>(mut self, key: K) -> Self {
+        self.pieces.push(Piece::Argument {
+            key: key.to_argument_key(),
+            specifier: None,
+        });
+        self
+    }
 }
 
 impl core::fmt::Display for Template {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         for piece in &self.pieces {
-            match piece {
-                Piece::Literal { start, end } => f.write_str(&self.template[*start..*end])?,
-                Piece::BracketOpen => f.write_str("{{")?,
-                Piece::BracketClose => f.write_str("}}")?,
-                Piece::Argument { key, specifier } => {
-                    f.write_char('{')?;
-                    write!(f, "{key}")?;
-                    if let Some(specifier) = specifier {
-                        f.write_char(':')?;
-                        write!(f, "{specifier}")?;
-                    }
-                    f.write_char('}')?;
-                }
-            };
+            write!(f, "{piece}")?;
         }
-
         Ok(())
     }
 }
 
 #[derive(Debug, Clone)]
 pub enum Piece {
-    Literal {
-        start: usize,
-        end: usize,
-    },
+    Literal(String),
     BracketOpen,
     BracketClose,
     Argument {
         key: ArgumentKey,
         specifier: Option<Specifier>,
     },
+}
+
+impl core::fmt::Display for Piece {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Piece::Literal(literal) => f.write_str(&literal),
+            Piece::BracketOpen => f.write_str("{{"),
+            Piece::BracketClose => f.write_str("}}"),
+            Piece::Argument { key, specifier } => {
+                f.write_char('{')?;
+                write!(f, "{key}")?;
+                if let Some(specifier) = specifier {
+                    f.write_char(':')?;
+                    write!(f, "{specifier}")?;
+                }
+                f.write_char('}')
+            }
+        }
+    }
 }
 
 pub trait ToTemplate {
@@ -76,7 +94,7 @@ impl ToTemplate for Template {
 
 impl ToTemplate for &str {
     fn to_template(self) -> Template {
-        Template::parse_str(self).unwrap()
+        Template::parse(self).unwrap()
     }
 }
 
@@ -130,7 +148,7 @@ impl core::fmt::Display for Alignment {
 
 #[derive(Debug, Clone)]
 pub enum Width {
-    Dynamic(ArgumentKey), // something$
+    Dynamic(ArgumentKey),
     Fixed(u16),
 }
 
@@ -149,7 +167,7 @@ impl core::fmt::Display for Width {
 #[derive(Debug, Clone)]
 pub enum Precision {
     Auto,
-    Dynamic(ArgumentKey), // .something$ or *
+    Dynamic(ArgumentKey),
     Fixed(u16),
 }
 

@@ -26,10 +26,7 @@ pub fn parse_pieces(input: &str) -> Result<Vec<Piece>, Error> {
             b'{' | b'}' => match (bracket, char) {
                 (None, _) => {
                     if cursor + 1 < current_char {
-                        pieces.push(Piece::Literal {
-                            start: cursor,
-                            end: current_char,
-                        });
+                        pieces.push(Piece::Literal(input[cursor..current_char].to_string()));
                     }
                     bracket = Some(char);
                     cursor = current_char;
@@ -215,10 +212,7 @@ pub fn parse_pieces(input: &str) -> Result<Vec<Piece>, Error> {
     }
 
     if cursor < current_char {
-        pieces.push(Piece::Literal {
-            start: cursor,
-            end: current_char,
-        });
+        pieces.push(Piece::Literal(input[cursor..current_char].to_string()));
     }
 
     Ok(pieces)
