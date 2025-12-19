@@ -120,11 +120,15 @@ impl<'ct> Arguments<'ct> {
         value: ArgumentValue<'ct>,
     ) -> Result<(), Error> {
         let argument_key = key.to_argument_key();
-        if self.find_argument_value(&argument_key).is_ok() {
+        if self
+            .argument_values
+            .iter()
+            .any(|(key, _)| key == &argument_key)
+        {
             return Err(Error::DuplicateArgument(argument_key));
         }
 
-        // This Check is very expensive and redundant for the macro case
+        // TODO: This Check is very expensive
         value
             .fullfills()
             .requires(&self.argument_type_requirements(&argument_key))?;
@@ -153,8 +157,14 @@ impl<'ct> core::fmt::Debug for Arguments<'ct> {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         f.debug_struct("Arguments")
             .field("template", &self.template)
-            // TODO
-            // .field("args", &self.argument_values)
+            .field(
+                "args",
+                &self
+                    .argument_values
+                    .iter()
+                    .map(|it| &it.0)
+                    .collect::<Vec<_>>(),
+            )
             .finish()
     }
 }

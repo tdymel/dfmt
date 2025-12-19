@@ -4,6 +4,7 @@
 TODO:
 - Write documentation with examples
 - Write Tests
+- Write Benchmarks
 - Implement and test no_std support
 
 - Add API to create Template directly and sidestep string based constructor and parser
@@ -16,7 +17,12 @@ TODO:
 
 - Add an API with the specialization feature
 
-- Implement Format via Arguments via Display as well
+- Instead of Option<Precision> add another enum value
+
+- Finalize Readme
+
+- Create CI/CD
+- Publish crate
 */
 
 mod argument;
