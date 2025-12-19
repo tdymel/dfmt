@@ -14,6 +14,6 @@ pub enum Error {
     UnexpectedArgumentValue,
     #[error("Failed to format value")]
     Fmt(#[from] core::fmt::Error),
-    #[error("Invalid template format")]
-    InvalidFormat,
+    #[error("Unexpected token encountered while parsing")]
+    UnexpectedToken,
 }

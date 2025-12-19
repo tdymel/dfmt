@@ -1,7 +1,6 @@
 use crate::{
     ArgumentKey, ArgumentTypeRequirements, Arguments, ToArgumentKey,
     error::Error,
-    parser::parse_pieces,
     values::{Piece, Precision, Specifier, Type, Width},
 };
 
@@ -13,7 +12,8 @@ pub struct Template {
 
 impl Template {
     pub fn parse(template: &str) -> Result<Self, Error> {
-        let pieces = parse_pieces(template)?;
+        let pieces = Piece::parse(template)?;
+
         let mut requirements = Vec::with_capacity(pieces.len());
         pieces.iter().for_each(|piece| match piece {
             Piece::Argument { key, specifier } => {

@@ -7,8 +7,6 @@ TODO:
 - Write Benchmarks
 - Implement and test no_std support
 
-- Impl Parser as impl of the individual values
-
 - Add an API with the specialization feature
 - Better handling of dynamic precision and width
 
@@ -17,12 +15,13 @@ TODO:
 
 - Create CI/CD
 - Publish crate
+
+- The specifier Parser is not very robust yet
 */
 
 mod error;
 mod macros;
 mod materials;
-mod parser;
 mod values;
 
 pub use error::Error;
