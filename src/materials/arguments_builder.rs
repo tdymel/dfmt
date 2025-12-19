@@ -1,6 +1,6 @@
 use crate::{
     ArgumentValue, Arguments, Error, ToArgumentKey,
-    argument::{FloatLike, IntegerLike},
+    values::{FloatLike, IntegerLike},
 };
 use core::fmt::{Binary, Debug, Display, LowerExp, LowerHex, Octal, Pointer, UpperExp, UpperHex};
 

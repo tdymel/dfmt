@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-use crate::argument::{ArgumentKey, ArgumentTypeRequirements};
+use crate::{ArgumentKey, ArgumentTypeRequirements};
 
 #[derive(Error, Debug)]
 pub enum Error {

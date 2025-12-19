@@ -7,9 +7,7 @@ TODO:
 - Write Benchmarks
 - Implement and test no_std support
 
-- Performance: The checking for add_argument_value adds overhead and the macro adds overhead by unwrapping these errors all the time.
-  - Make a fully unchecked version of the macro that just panics but avoids these wrappings
-- Clean up files and pull things apart
+- Impl Parser as impl of the individual values
 
 - Add an API with the specialization feature
 - Better handling of dynamic precision and width
@@ -21,18 +19,14 @@ TODO:
 - Publish crate
 */
 
-mod argument;
-mod arguments;
-mod arguments_builder;
-mod dyn_fmt;
 mod error;
-mod parser;
-mod template;
 mod macros;
+mod materials;
+mod parser;
+mod values;
 
-pub use argument::{ArgumentKey, ArgumentTypeRequirements, ArgumentValue, ToArgumentKey};
-pub use arguments::Arguments;
-pub use arguments_builder::{ArgumentsBuilder, UncheckedArgumentsBuilder};
-pub use dyn_fmt::DynFmt;
 pub use error::Error;
-pub use template::{Template, ToTemplate};
+pub use materials::{
+    Arguments, ArgumentsBuilder, DynFmt, Template, ToTemplate, UncheckedArgumentsBuilder,
+};
+pub use values::{ArgumentKey, ArgumentTypeRequirements, ArgumentValue, ToArgumentKey};
