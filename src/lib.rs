@@ -4,7 +4,6 @@
 TODO:
 - Write documentation with examples
 - Write Tests
-- Implement ToTemplate String function via Display probably
 - Implement and test no_std support
 
 - Add API to create Template directly and sidestep string based constructor and parser
@@ -18,6 +17,8 @@ TODO:
 - Add an API with the specialization feature
 
 - Rename the crate to dfmt
+
+- Implement Format via Arguments via Display as well
 */
 
 mod argument;

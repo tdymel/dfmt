@@ -1,3 +1,5 @@
+use core::fmt::Write;
+
 use crate::{Arguments, argument::ArgumentKey, error::Error, parser::parse_pieces};
 
 #[derive(Debug, Clone)]
@@ -27,7 +29,24 @@ impl Template {
 
 impl core::fmt::Display for Template {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        todo!()
+        for piece in &self.pieces {
+            match piece {
+                Piece::Literal { start, end } => f.write_str(&self.template[*start..*end])?,
+                Piece::BracketOpen => f.write_str("{{")?,
+                Piece::BracketClose => f.write_str("}}")?,
+                Piece::Argument { key, specifier } => {
+                    f.write_char('{')?;
+                    write!(f, "{key}")?;
+                    if let Some(specifier) = specifier {
+                        f.write_char(':')?;
+                        write!(f, "{specifier}")?;
+                    }
+                    f.write_char('}')?;
+                }
+            };
+        }
+
+        Ok(())
     }
 }
 
@@ -74,11 +93,37 @@ pub enum Type {
     Display,
 }
 
+impl core::fmt::Display for Type {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Type::Binary => f.write_char('b'),
+            Type::Octal => f.write_char('o'),
+            Type::LowerHex => f.write_char('x'),
+            Type::UpperHex => f.write_char('X'),
+            Type::Pointer => f.write_char('p'),
+            Type::LowerExp => f.write_char('e'),
+            Type::UpperExp => f.write_char('E'),
+            Type::Debug => f.write_char('?'),
+            Type::Display => Ok(()),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 pub enum Alignment {
     Left,
     Center,
     Right,
+}
+
+impl core::fmt::Display for Alignment {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Alignment::Left => f.write_char('<'),
+            Alignment::Center => f.write_char('^'),
+            Alignment::Right => f.write_char('>'),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -87,10 +132,35 @@ pub enum Width {
     Fixed(usize),
 }
 
+impl core::fmt::Display for Width {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            Width::Dynamic(argument_key) => {
+                write!(f, "{argument_key}")?;
+                f.write_char('$')
+            }
+            Width::Fixed(amount) => write!(f, "{amount}"),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum Precision {
     Dynamic(ArgumentKey), // .something$ or *
     Fixed(usize),
+}
+
+impl core::fmt::Display for Precision {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.write_char('.')?;
+        match self {
+            Precision::Dynamic(argument_key) => {
+                write!(f, "{argument_key}")?;
+                f.write_char('$')
+            }
+            Precision::Fixed(amount) => write!(f, "{amount}"),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -147,5 +217,32 @@ impl<'a> Default for Specifier {
             width: Width::Fixed(0),
             precision: Default::default(),
         }
+    }
+}
+
+impl core::fmt::Display for Specifier {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        if let Some(fill_character) = self.fill_character {
+            write!(f, "{fill_character}")?;
+        }
+        if let Some(alignment) = self.alignment {
+            write!(f, "{alignment}")?;
+        }
+        if self.sign {
+            f.write_char('+')?;
+        }
+        if self.alternate_form {
+            f.write_char('#')?;
+        }
+        if self.pad_zero {
+            f.write_char('0')?;
+        }
+        write!(f, "{}", self.width)?;
+        if let Some(precision) = &self.precision {
+            write!(f, "{precision}")?;
+        }
+        write!(f, "{}", self.ty)?;
+
+        Ok(())
     }
 }

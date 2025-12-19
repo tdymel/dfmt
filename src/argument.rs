@@ -161,6 +161,15 @@ pub enum ArgumentKey {
     Name(String),
 }
 
+impl Display for ArgumentKey {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        match self {
+            ArgumentKey::Index(index) => write!(f, "{index}"),
+            ArgumentKey::Name(name) => write!(f, "{name}"),
+        }
+    }
+}
+
 pub trait ToArgumentKey {
     fn to_argument_key(&self) -> ArgumentKey;
 }
