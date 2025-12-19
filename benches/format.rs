@@ -1,6 +1,8 @@
 use criterion::{Criterion, criterion_group, criterion_main};
 use dyf::{FormatString, dformat as dyf_dformat};
-use dyn_str_fmt::{ArgumentsBuilder, Template, UncheckedArgumentsBuilder, dformat, dformat_unchecked, parse_pieces};
+use dyn_str_fmt::{
+    ArgumentsBuilder, Template, UncheckedArgumentsBuilder, dformat, dformat_unchecked,
+};
 
 #[derive(Debug)]
 pub struct TestStruct {

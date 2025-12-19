@@ -1,6 +1,6 @@
 #![feature(formatting_options)]
 
-use dyn_str_fmt::{Template, dformat, dformat_unchecked, parse_pieces};
+use dyn_str_fmt::{Template, dformat, dformat_unchecked};
 
 #[test]
 fn black_magic4() {
@@ -19,12 +19,6 @@ fn black_magic4() {
         "format! macro under the hood: {}",
         dformat!("Black magic: {test:+^+#0width$.5b}", test = &42, width = 50).unwrap()
     );
-}
-
-#[test]
-fn parser() {
-    let str_template = "Black magic: {{{test:+^+#0width$.prec$b}}}.";
-    println!("{:?}", parse_pieces(str_template));
 }
 
 #[test]

@@ -35,6 +35,3 @@ pub use arguments_builder::{ArgumentsBuilder, UncheckedArgumentsBuilder};
 pub use dyn_fmt::DynFmt;
 pub use error::Error;
 pub use template::{Template, ToTemplate};
-
-// TODO: Only for benchmarks
-pub use parser::parse_pieces;
