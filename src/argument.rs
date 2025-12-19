@@ -23,8 +23,9 @@ pub enum ArgumentValue<'ct> {
 impl<'ct> ArgumentValue<'ct> {
     pub fn to_u16(&self) -> Option<u16> {
         match self {
-            // TODO: Hacky, but it works for all relevant purposes
             ArgumentValue::Display(value) => value.to_string().parse::<u16>().ok(),
+            ArgumentValue::DisplayAndDebug(value) => value.to_string().parse::<u16>().ok(),
+            ArgumentValue::IntegerLike(value) => value.to_string().parse::<u16>().ok(),
             _ => None,
         }
     }

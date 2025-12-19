@@ -16,6 +16,7 @@ TODO:
 - Rename internal macros, such that they are not easily found
 
 - Add an API with the specialization feature
+- Better handling of dynamic precision and width
 
 - Finalize Readme
 
