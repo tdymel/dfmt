@@ -19,39 +19,6 @@ impl<'ct> Arguments<'ct> {
         }
     }
 
-    pub fn argument_type_requirements(
-        &self,
-        argument_key: &ArgumentKey,
-    ) -> ArgumentTypeRequirements {
-        self.template
-            .pieces
-            .iter()
-            .filter(|it| match it {
-                Piece::Argument { key, .. } => key == argument_key,
-                _ => false,
-            })
-            .fold(ArgumentTypeRequirements::default(), |mut atr, arg| {
-                // TODO: Width and Precision
-                if let Piece::Argument { specifier, .. } = arg
-                    && let Some(specifier) = specifier
-                {
-                    match specifier.ty {
-                        Type::Binary => atr.binary = true,
-                        Type::LowerHex => atr.lower_hex = true,
-                        Type::UpperHex => atr.upper_hex = true,
-                        Type::Octal => atr.octal = true,
-                        Type::LowerExp => atr.lower_exp = true,
-                        Type::UpperExp => atr.upper_exp = true,
-                        Type::Debug => atr.debug = true,
-                        Type::Display => atr.display = true,
-                        Type::Pointer => atr.pointer = true,
-                    }
-                }
-
-                atr
-            })
-    }
-
     fn find_argument_value(&self, key: &ArgumentKey) -> Result<&ArgumentValue<'ct>, Error> {
         self.argument_values
             .iter()
@@ -136,7 +103,7 @@ impl<'ct> Arguments<'ct> {
         // TODO: This Check is very expensive
         value
             .fullfills()
-            .requires(&self.argument_type_requirements(&argument_key))?;
+            .requires(self.template.argument_type_requirements(&argument_key)?)?;
         self.argument_values.push((argument_key, value));
         Ok(())
     }

@@ -265,6 +265,20 @@ impl ArgumentTypeRequirements {
         self
     }
 
+    pub fn set_requirement(&mut self, ty: Type) {
+        match ty {
+            Type::Binary => self.binary = true,
+            Type::Octal => self.octal = true,
+            Type::LowerHex => self.lower_hex = true,
+            Type::UpperHex => self.upper_hex = true,
+            Type::Pointer => self.pointer = true,
+            Type::LowerExp => self.lower_exp = true,
+            Type::UpperExp => self.upper_exp = true,
+            Type::Debug => self.debug = true,
+            Type::Display => self.display = true,
+        };
+    }
+
     pub fn requires(&self, other: &Self) -> Result<(), Error> {
         if (!other.display || self.display)
             && (!other.debug || self.debug)

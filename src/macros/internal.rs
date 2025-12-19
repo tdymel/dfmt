@@ -39,7 +39,7 @@ macro_rules! __internal__dfmt_process_args {
 #[macro_export]
 macro_rules! __internal__dfmt_process {
     ($checked:literal, $arguments:expr, $key:expr, $value:expr) => {{
-        let typed_value = match $arguments.argument_type_requirements(&$key) {
+        let typed_value = match $arguments.template.argument_type_requirements(&$key)? {
             $crate::ArgumentTypeRequirements {
                 debug: true,
                 display: true,

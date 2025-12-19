@@ -1,16 +1,33 @@
 use core::fmt::Write;
 
-use crate::{Arguments, ToArgumentKey, argument::ArgumentKey, error::Error, parser::parse_pieces};
+use crate::{
+    ArgumentTypeRequirements, Arguments, ToArgumentKey, argument::ArgumentKey, error::Error,
+    parser::parse_pieces,
+};
 
 #[derive(Debug, Clone)]
 pub struct Template {
     pub pieces: Vec<Piece>,
+    pub requirements: Vec<(ArgumentKey, ArgumentTypeRequirements)>,
 }
 
 impl Template {
     pub fn parse(template: &str) -> Result<Self, Error> {
         let pieces = parse_pieces(template)?;
-        Ok(Self { pieces })
+        let mut requirements = Vec::with_capacity(pieces.len());
+        pieces.iter().for_each(|piece| match piece {
+            Piece::Argument { key, specifier } => Template::add_requirement(
+                &mut requirements,
+                key,
+                specifier.as_ref().map(|it| it.ty).unwrap_or(Type::Display),
+            ),
+            _ => {}
+        });
+
+        Ok(Self {
+            pieces,
+            requirements,
+        })
     }
 
     pub fn arguments(&self) -> Arguments<'_> {
@@ -27,19 +44,50 @@ impl Template {
     }
 
     pub fn specified_argument<K: ToArgumentKey>(mut self, key: K, specifier: Specifier) -> Self {
+        let argument_key = key.to_argument_key();
+        Template::add_requirement(&mut self.requirements, &argument_key, specifier.ty);
         self.pieces.push(Piece::Argument {
-            key: key.to_argument_key(),
+            key: argument_key,
             specifier: Some(specifier),
         });
         self
     }
 
     pub fn argument<K: ToArgumentKey>(mut self, key: K) -> Self {
+        let argument_key = key.to_argument_key();
+        Template::add_requirement(&mut self.requirements, &argument_key, Type::Display);
         self.pieces.push(Piece::Argument {
-            key: key.to_argument_key(),
+            key: argument_key,
             specifier: None,
         });
         self
+    }
+
+    pub fn argument_type_requirements(
+        &self,
+        argument_key: &ArgumentKey,
+    ) -> Result<&ArgumentTypeRequirements, Error> {
+        self.requirements
+            .iter()
+            .find(|it| &it.0 == argument_key)
+            .map(|it| &it.1)
+            .ok_or_else(|| Error::ArgumentNotFound(argument_key.clone()))
+    }
+
+    fn add_requirement(
+        requirements: &mut Vec<(ArgumentKey, ArgumentTypeRequirements)>,
+        argument_key: &ArgumentKey,
+        ty: Type,
+    ) {
+        if let Some((_, requirements)) =
+            requirements.iter_mut().find(|(key, _)| key == argument_key)
+        {
+            requirements.set_requirement(ty);
+        } else {
+            let mut requirement = ArgumentTypeRequirements::default();
+            requirement.set_requirement(ty);
+            requirements.push((argument_key.clone(), requirement));
+        };
     }
 }
 

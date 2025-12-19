@@ -27,7 +27,7 @@ fn format_perf(c: &mut Criterion) {
         "This is a {{{}}} example. The magic number is {}. Float = {}. Bool = {}.".to_owned(),
     )
     .unwrap();
-    let format_string = "This is a {{{0}}} {1} {2} {3} {4:?}.".to_string();
+    let format_string = "This is a {{{0}}} {1} {2} {3}.".to_string();
     let compiled_template = Template::parse(format_string.as_str()).unwrap();
 
     let magic_number = 42;
@@ -75,8 +75,7 @@ fn format_perf(c: &mut Criterion) {
                 arg1,
                 magic_number,
                 float_number,
-                bool_value,
-                debug_struct
+                bool_value
             )
         });
     });
