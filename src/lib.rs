@@ -16,8 +16,6 @@ TODO:
 
 - Add an API with the specialization feature
 
-- Rename the crate to dfmt
-
 - Implement Format via Arguments via Display as well
 */
 

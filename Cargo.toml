@@ -1,5 +1,5 @@
 [package]
-name = "dyn-str-fmt"
+name = "dfmt"
 authors = ["Tom Dymel <tom@dymel.dev>"]
 version = "0.1.0"
 edition = "2024"

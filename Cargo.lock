@@ -213,6 +213,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "dfmt"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "dyf",
+ "thiserror",
+]
+
+[[package]]
 name = "digest"
 version = "0.10.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -230,15 +239,6 @@ checksum = "0080458b2988e572901ab4a0b1b293fd06587467637dfc4d8fb497724cfa3d63"
 dependencies = [
  "pest",
  "pest_derive",
- "thiserror",
-]
-
-[[package]]
-name = "dyn-str-fmt"
-version = "0.1.0"
-dependencies = [
- "criterion",
- "dyf",
  "thiserror",
 ]
 

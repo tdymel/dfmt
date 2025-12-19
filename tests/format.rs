@@ -1,6 +1,6 @@
 #![feature(formatting_options)]
 
-use dyn_str_fmt::{Template, dformat, dformat_unchecked};
+use dfmt::{Template, dformat, dformat_unchecked};
 
 #[test]
 fn black_magic4() {
