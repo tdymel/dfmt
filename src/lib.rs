@@ -10,12 +10,12 @@ TODO:
 - Performance: The checking for add_argument_value adds overhead and the macro adds overhead by unwrapping these errors all the time.
   - Make a fully unchecked version of the macro that just panics but avoids these wrappings
 - Clean up files and pull things apart
-- Rename internal macros, such that they are not easily found
 
 - Add an API with the specialization feature
 - Better handling of dynamic precision and width
 
 - Finalize Readme
+- Fix Contributing
 
 - Create CI/CD
 - Publish crate
@@ -24,11 +24,11 @@ TODO:
 mod argument;
 mod arguments;
 mod arguments_builder;
-mod black_magic;
 mod dyn_fmt;
 mod error;
 mod parser;
 mod template;
+mod macros;
 
 pub use argument::{ArgumentKey, ArgumentTypeRequirements, ArgumentValue, ToArgumentKey};
 pub use arguments::Arguments;
