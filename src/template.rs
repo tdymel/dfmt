@@ -16,11 +16,19 @@ impl Template {
         let pieces = parse_pieces(template)?;
         let mut requirements = Vec::with_capacity(pieces.len());
         pieces.iter().for_each(|piece| match piece {
-            Piece::Argument { key, specifier } => Template::add_requirement(
-                &mut requirements,
-                key,
-                specifier.as_ref().map(|it| it.ty).unwrap_or(Type::Display),
-            ),
+            Piece::Argument { key, specifier } => {
+                if let Some(specifier) = specifier {
+                    Template::add_requirement(&mut requirements, key, specifier.ty);
+                    if let Precision::Dynamic(precision_key) = &specifier.precision {
+                        Template::add_requirement(&mut requirements, precision_key, Type::Display);
+                    }
+                    if let Width::Dynamic(width_key) = &specifier.width {
+                        Template::add_requirement(&mut requirements, width_key, Type::Display);
+                    }
+                } else {
+                    Template::add_requirement(&mut requirements, key, Type::Display);
+                }
+            }
             _ => {}
         });
 
@@ -46,6 +54,12 @@ impl Template {
     pub fn specified_argument<K: ToArgumentKey>(mut self, key: K, specifier: Specifier) -> Self {
         let argument_key = key.to_argument_key();
         Template::add_requirement(&mut self.requirements, &argument_key, specifier.ty);
+        if let Precision::Dynamic(precision_key) = &specifier.precision {
+            Template::add_requirement(&mut self.requirements, precision_key, Type::Display);
+        }
+        if let Width::Dynamic(width_key) = &specifier.width {
+            Template::add_requirement(&mut self.requirements, width_key, Type::Display);
+        }
         self.pieces.push(Piece::Argument {
             key: argument_key,
             specifier: Some(specifier),

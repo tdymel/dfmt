@@ -1,7 +1,4 @@
-use crate::{
-    ArgumentKey, ArgumentTypeRequirements, ArgumentValue, Error, ToArgumentKey,
-    argument::TypedValue, template::*,
-};
+use crate::{ArgumentKey, ArgumentValue, Error, ToArgumentKey, argument::TypedValue, template::*};
 use core::fmt::Write;
 
 use crate::template::Template;

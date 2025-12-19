@@ -39,134 +39,78 @@ macro_rules! __internal__dfmt_process_args {
 #[macro_export]
 macro_rules! __internal__dfmt_process {
     ($checked:literal, $arguments:expr, $key:expr, $value:expr) => {{
-        let typed_value = match $arguments.template.argument_type_requirements(&$key)? {
-            $crate::ArgumentTypeRequirements {
-                debug: true,
-                display: true,
-                lower_exp: true,
-                upper_exp: true,
-                lower_hex: true,
-                upper_hex: true,
-                binary: true,
-                octal: true,
-                ..
-            } => {
-                trait IntegerLike:
-                    core::fmt::Display
+        struct WrappedArg<'a, T>(&'a T);
+        trait BlackMagic<'a> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error>;
+        }
+        impl<'a, T: core::fmt::Display
                     + core::fmt::Debug
                     + core::fmt::LowerExp
                     + core::fmt::UpperExp
                     + core::fmt::LowerHex
                     + core::fmt::UpperHex
                     + core::fmt::Binary
-                    + core::fmt::Octal
-                {
-                }
-                impl<
-                    T: core::fmt::Display
-                        + core::fmt::Debug
-                        + core::fmt::LowerExp
-                        + core::fmt::UpperExp
-                        + core::fmt::LowerHex
-                        + core::fmt::UpperHex
-                        + core::fmt::Binary
-                        + core::fmt::Octal,
-                > IntegerLike for T
-                {
-                }
-                $crate::__internal__dfmt_perform_black_magic!($value, IntegerLike, IntegerLike)
+                    + core::fmt::Octal> BlackMagic<'a> for &&&&&&&&&&&&WrappedArg<'a, T> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
+                Ok($crate::ArgumentValue::IntegerLike(self.0))
             }
-            $crate::ArgumentTypeRequirements {
-                debug: true,
-                display: true,
-                lower_exp: true,
-                upper_exp: true,
-                ..
-            } => {
-                trait FloatLike:
-                    core::fmt::Display
+        }
+        impl<'a, T: core::fmt::Display
                     + core::fmt::Debug
                     + core::fmt::LowerExp
-                    + core::fmt::UpperExp
-                {
-                }
-                impl<
-                    T: core::fmt::Display
-                        + core::fmt::Debug
-                        + core::fmt::LowerExp
-                        + core::fmt::UpperExp,
-                > FloatLike for T
-                {
-                }
-                $crate::__internal__dfmt_perform_black_magic!($value, FloatLike, FloatLike)
-            }
-            $crate::ArgumentTypeRequirements {
-                debug: true,
-                display: true,
-                ..
-            } => {
-                trait DisplayAndDebug: core::fmt::Display + core::fmt::Debug {}
-                impl<T: core::fmt::Display + core::fmt::Debug> DisplayAndDebug for T {}
-                $crate::__internal__dfmt_perform_black_magic!($value, DisplayAndDebug, DisplayAndDebug)
-            }
-            $crate::ArgumentTypeRequirements { display: true, .. } => {
-                $crate::__internal__dfmt_perform_black_magic!($value, Display, core::fmt::Display)
-            }
-            $crate::ArgumentTypeRequirements { debug: true, .. } => {
-                $crate::__internal__dfmt_perform_black_magic!($value, Debug, core::fmt::Debug)
-            }
-            $crate::ArgumentTypeRequirements { binary: true, .. } => {
-                $crate::__internal__dfmt_perform_black_magic!($value, Binary, core::fmt::Binary)
-            }
-            $crate::ArgumentTypeRequirements { octal: true, .. } => {
-                $crate::__internal__dfmt_perform_black_magic!($value, Octal, core::fmt::Octal)
-            }
-            $crate::ArgumentTypeRequirements { pointer: true, .. } => {
-                $crate::__internal__dfmt_perform_black_magic!($value, Pointer, core::fmt::Pointer)
-            }
-            $crate::ArgumentTypeRequirements {
-                lower_exp: true, ..
-            } => {
-                $crate::__internal__dfmt_perform_black_magic!($value, LowerExp, core::fmt::LowerExp)
-            }
-            $crate::ArgumentTypeRequirements {
-                upper_exp: true, ..
-            } => {
-                $crate::__internal__dfmt_perform_black_magic!($value, UpperExp, core::fmt::UpperExp)
-            }
-            $crate::ArgumentTypeRequirements {
-                lower_hex: true, ..
-            } => {
-                $crate::__internal__dfmt_perform_black_magic!($value, LowerHex, core::fmt::LowerHex)
-            }
-            $crate::ArgumentTypeRequirements {
-                upper_hex: true, ..
-            } => {
-                $crate::__internal__dfmt_perform_black_magic!($value, UpperHex, core::fmt::UpperHex)
-            }
-            $crate::ArgumentTypeRequirements { .. } => {
-                $crate::__internal__dfmt_perform_black_magic!($value, Display, core::fmt::Display)
-            }
-        };
-        if $checked {
-            $arguments.add_argument_value($key, typed_value)
-        } else {
-            $arguments.add_argument_value_unchecked($key, typed_value);
-            Ok(()) as Result<(), $crate::Error>
-        }
-    }};
-}
-
-#[macro_export]
-macro_rules! __internal__dfmt_perform_black_magic {
-    ($value:expr, $variant:ident, $type:path) => {{
-        struct WrappedArg<'a, T>(&'a T);
-        trait BlackMagic<'a> {
-            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error>;
-        }
-        impl<'a, T: $type> BlackMagic<'a> for &WrappedArg<'a, T> {
+                    + core::fmt::UpperExp> BlackMagic<'a> for &&&&&&&&&&&WrappedArg<'a, T> {
             fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
-                Ok($crate::ArgumentValue::$variant(self.0))
+                Ok($crate::ArgumentValue::FloatLike(self.0))
+            }
+        }
+        impl<'a, T: core::fmt::Display + core::fmt::Debug> BlackMagic<'a> for &&&&&&&&&&WrappedArg<'a, T> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
+                Ok($crate::ArgumentValue::DisplayAndDebug(self.0))
+            }
+        }
+        impl<'a, T: core::fmt::Display> BlackMagic<'a> for &&&&&&&&&WrappedArg<'a, T> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
+                Ok($crate::ArgumentValue::Display(self.0))
+            }
+        }
+        impl<'a, T: core::fmt::Debug> BlackMagic<'a> for &&&&&&&&WrappedArg<'a, T> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
+                Ok($crate::ArgumentValue::Debug(self.0))
+            }
+        }
+        impl<'a, T: core::fmt::LowerHex> BlackMagic<'a> for &&&&&&&WrappedArg<'a, T> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
+                Ok($crate::ArgumentValue::LowerHex(self.0))
+            }
+        }
+        impl<'a, T: core::fmt::UpperHex> BlackMagic<'a> for &&&&&&WrappedArg<'a, T> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
+                Ok($crate::ArgumentValue::UpperHex(self.0))
+            }
+        }
+        impl<'a, T: core::fmt::LowerExp> BlackMagic<'a> for &&&&&WrappedArg<'a, T> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
+                Ok($crate::ArgumentValue::LowerExp(self.0))
+            }
+        }
+        impl<'a, T: core::fmt::UpperExp> BlackMagic<'a> for &&&&WrappedArg<'a, T> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
+                Ok($crate::ArgumentValue::UpperExp(self.0))
+            }
+        }
+        impl<'a, T: core::fmt::Octal> BlackMagic<'a> for &&&WrappedArg<'a, T> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
+                Ok($crate::ArgumentValue::Octal(self.0))
+            }
+        }
+        impl<'a, T: core::fmt::Binary> BlackMagic<'a> for &&WrappedArg<'a, T> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
+                Ok($crate::ArgumentValue::Binary(self.0))
+            }
+        }
+        impl<'a, T: core::fmt::Pointer> BlackMagic<'a> for &WrappedArg<'a, T> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
+                Ok($crate::ArgumentValue::Pointer(self.0))
             }
         }
         impl<'a, T> BlackMagic<'a> for WrappedArg<'a, T> {
@@ -175,6 +119,12 @@ macro_rules! __internal__dfmt_perform_black_magic {
             }
         }
 
-        (&&&WrappedArg(&$value)).to_argument_value()?
+        let typed_value = (&&&&&&&&&&&&&WrappedArg(&$value)).to_argument_value()?;
+        if $checked {
+            $arguments.add_argument_value($key, typed_value)
+        } else {
+            $arguments.add_argument_value_unchecked($key, typed_value);
+            Ok(()) as Result<(), $crate::Error>
+        }
     }};
 }
