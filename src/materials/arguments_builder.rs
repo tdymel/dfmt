@@ -1,28 +1,23 @@
-use crate::{ArgumentValue, Arguments, Error, ToArgumentKey};
+use crate::{ArgumentValue, Arguments, Error, ToArgumentKey, WidthOrPrecisionAmount};
 use core::fmt::{Binary, Debug, Display, LowerExp, LowerHex, Octal, Pointer, UpperExp, UpperHex};
 
 pub trait ArgumentsBuilder<'a> {
     fn format(self) -> Result<String, Error>;
-
     fn argument_value<K: ToArgumentKey>(self, key: K, value: ArgumentValue<'a>) -> Self;
-
     fn display<T: Display, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn debug<T: Debug, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn binary<T: Binary, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn octal<T: Octal, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn pointer<T: Pointer, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn lower_exp<T: LowerExp, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn upper_exp<T: UpperExp, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn lower_hex<T: LowerHex, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn upper_hex<T: UpperHex, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
+    fn width_or_precision_amount<T: WidthOrPrecisionAmount, K: ToArgumentKey>(
+        self,
+        key: K,
+        value: &'a T,
+    ) -> Self;
 }
 
 impl<'a> ArgumentsBuilder<'a> for Result<Arguments<'a>, Error> {
@@ -129,27 +124,33 @@ impl<'a> ArgumentsBuilder<'a> for Result<Arguments<'a>, Error> {
         args.add_argument_value(key, ArgumentValue::UpperHex(value))?;
         Ok(args)
     }
+
+    fn width_or_precision_amount<T: WidthOrPrecisionAmount, K: ToArgumentKey>(
+        self,
+        key: K,
+        value: &'a T,
+    ) -> Self {
+        let mut args = self?;
+        args.add_argument_value(key, ArgumentValue::WidthOrPrecisionAmount(value))?;
+        Ok(args)
+    }
 }
 pub trait UncheckedArgumentsBuilder<'a> {
     fn argument_value_unchecked<K: ToArgumentKey>(self, key: K, value: ArgumentValue<'a>) -> Self;
-
     fn display_unchecked<T: Display, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn debug_unchecked<T: Debug, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn binary_unchecked<T: Binary, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn octal_unchecked<T: Octal, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn pointer_unchecked<T: Pointer, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn lower_exp_unchecked<T: LowerExp, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn upper_exp_unchecked<T: UpperExp, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn lower_hex_unchecked<T: LowerHex, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
     fn upper_hex_unchecked<T: UpperHex, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
+    fn width_or_precision_amount_unchecked<T: WidthOrPrecisionAmount, K: ToArgumentKey>(
+        self,
+        key: K,
+        value: &'a T,
+    ) -> Self;
 }
 
 impl<'a> UncheckedArgumentsBuilder<'a> for Arguments<'a> {
@@ -240,6 +241,15 @@ impl<'a> UncheckedArgumentsBuilder<'a> for Arguments<'a> {
         value: &'a T,
     ) -> Arguments<'a> {
         self.add_argument_value_unchecked(key, ArgumentValue::UpperHex(value));
+        self
+    }
+
+    fn width_or_precision_amount_unchecked<T: WidthOrPrecisionAmount, K: ToArgumentKey>(
+        mut self,
+        key: K,
+        value: &'a T,
+    ) -> Self {
+        self.add_argument_value_unchecked(key, ArgumentValue::WidthOrPrecisionAmount(value));
         self
     }
 }

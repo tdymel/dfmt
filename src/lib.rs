@@ -3,7 +3,6 @@
 /*
 TODO:
 - Write documentation with examples
-- Write Benchmarks
 
 - Finalize Readme
 - Fix Contributing

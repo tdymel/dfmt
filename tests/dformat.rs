@@ -19,6 +19,7 @@ macro_rules! test_dformat {
 }
 
 test_dformat!(with_literal_pieces, "Hello, {}!", "world");
+test_dformat!(with_escaped_braces, "Hello, {{{}}}!", "world");
 test_dformat!(with_non_ascii_chars, "Привет, {}!", "мир");
 test_dformat!(with_non_ascii_chars_2, "Привет, {:^50}!", "мир");
 test_dformat!(named_arg, "{arg} {} {0}", "Hello", arg = 42);

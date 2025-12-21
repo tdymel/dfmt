@@ -37,7 +37,7 @@ impl<'ct> Arguments<'ct> {
                 .map(|piece| match piece {
                     Piece::Literal(literal) => literal.len(),
                     Piece::BracketOpen | Piece::BracketClose => 1,
-                    _ => 20,
+                    _ => 40,
                 })
                 .sum(),
         );

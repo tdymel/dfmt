@@ -3,7 +3,16 @@ name = "dfmt"
 authors = ["Tom Dymel <tom@dymel.dev>"]
 version = "0.1.0"
 edition = "2024"
-keywords = ["dynamic", "dyn", "format", "fmt", "string", "str", "args", "arguments"]
+keywords = [
+    "dynamic",
+    "dyn",
+    "format",
+    "fmt",
+    "string",
+    "str",
+    "args",
+    "arguments",
+]
 categories = ["no-std"]
 description = "A fully featured dynamic drop in replacement for the format! macro."
 readme = "README.md"
@@ -16,11 +25,10 @@ thiserror = "2"
 
 [dev-dependencies]
 criterion = "0"
-dyf = "0"
 
 [[bench]]
-name = "format"
+name = "performance"
 harness = false
 
 [features]
-nightly_formatting_options=[]
+nightly_formatting_options = []
