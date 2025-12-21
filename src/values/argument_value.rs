@@ -13,6 +13,8 @@ pub enum ArgumentValue<'ct> {
     Octal(&'ct dyn Octal),
     Pointer(&'ct dyn Pointer),
 
+    DynPointer(&'ct dyn DynPointer),
+
     DisplayAndDebug(&'ct dyn DisplayAndDebug),
     IntegerLike(&'ct dyn IntegerLike),
     FloatLike(&'ct dyn FloatLike),
@@ -40,6 +42,7 @@ impl<'ct> ArgumentValue<'ct> {
             ArgumentValue::UpperHex(_) => requirements.add_requirement(Type::UpperHex),
             ArgumentValue::Octal(_) => requirements.add_requirement(Type::Octal),
             ArgumentValue::Pointer(_) => requirements.add_requirement(Type::Pointer),
+            ArgumentValue::DynPointer(_) => requirements.add_requirement(Type::Pointer),
             ArgumentValue::DisplayAndDebug(_) => {
                 requirements.add_requirement(Type::Display);
                 requirements.add_requirement(Type::Debug);
@@ -62,6 +65,15 @@ impl<'ct> ArgumentValue<'ct> {
             }
         };
         requirements
+    }
+}
+
+pub trait DynPointer: Pointer {
+    fn dyn_fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result;
+}
+impl<T> DynPointer for T where T: Pointer {
+    fn dyn_fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        self.fmt(f)
     }
 }
 

@@ -8,14 +8,6 @@ struct TestStruct;
 const TEST_VALUE: i32 = 42;
 const TEST_POINTER: *const i32 = &TEST_VALUE;
 
-#[test]
-fn debug_verify() {
-    assert_eq!(
-        dformat!("{:p}".to_string(), TEST_POINTER).unwrap(),
-        format!("{:p}", TEST_POINTER)
-    )
-}
-
 macro_rules! test_dformat {
     ($test_name:ident, $template:literal, $($args:tt)*) => {
         #[test]
@@ -28,14 +20,14 @@ macro_rules! test_dformat {
     };
 }
 
-// test_dformat!(with_literal_pieces, "Hello, {}!", "world");
-// test_dformat!(named_arg, "{arg} {}", "Hello", arg = 42);
-// test_dformat!(indexed_arg, "{0} {1} {0}", 42, "Hello");
-// test_dformat!(empty_spec, "{:}", "Hello");
-// test_dformat!(ty_debug, "{:?}", TestStruct {});
-// test_dformat!(ty_binary, "{:b}", 42);
-// test_dformat!(ty_octal, "{:o}", 42);
-// test_dformat!(ty_pointer, "{:p}", TEST_POINTER);
+test_dformat!(with_literal_pieces, "Hello, {}!", "world");
+test_dformat!(named_arg, "{arg} {}", "Hello", arg = 42);
+test_dformat!(indexed_arg, "{0} {1} {0}", 42, "Hello");
+test_dformat!(empty_spec, "{:}", "Hello");
+test_dformat!(ty_debug, "{:?}", TestStruct {});
+test_dformat!(ty_binary, "{:b}", 42);
+test_dformat!(ty_octal, "{:o}", 42);
+test_dformat!(ty_pointer, "{:p}", TEST_POINTER);
 
 // #[test]
 // fn dformat() {

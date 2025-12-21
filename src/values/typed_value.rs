@@ -71,6 +71,9 @@ impl<'ct> core::fmt::Display for TypedValue<'ct> {
                 core::fmt::UpperExp::fmt(value, formatter)
             }
             // Everything supports the pointer type
+            (ArgumentValue::DynPointer(value), Type::Pointer) => {
+                value.dyn_fmt(formatter)
+            }
             (ArgumentValue::Pointer(value), Type::Pointer) => {
                 core::fmt::Pointer::fmt(value, formatter)
             }
