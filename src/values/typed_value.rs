@@ -78,7 +78,6 @@ impl<'ct> core::fmt::Display for TypedValue<'ct> {
                 core::fmt::Pointer::fmt(value, formatter)
             }
             (ArgumentValue::Debug(value), Type::Pointer) => {
-                println!("RUN INTO DEBUG");
                 core::fmt::Pointer::fmt(value, formatter)
             }
             (ArgumentValue::Binary(value), Type::Pointer) => {
@@ -94,7 +93,6 @@ impl<'ct> core::fmt::Display for TypedValue<'ct> {
                 core::fmt::Pointer::fmt(value, formatter)
             }
             (ArgumentValue::LowerHex(value), Type::Pointer) => {
-                println!("RUN INTO HERE");
                 core::fmt::Pointer::fmt(value, formatter)
             }
             (ArgumentValue::UpperHex(value), Type::Pointer) => {
