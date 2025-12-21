@@ -58,14 +58,14 @@ especially for the fill character case and to reduce compilation complexity.
 | Template::parse - simple - 7 arg | 292 ns |
 | Template::parse - complex | 693 ns |
 | dformat! - simple - 1 arg | 51 ns |
-| dformat! - simple - 7 args | 260 ns |
 | dformat_unchecked! - simple - 1 arg | 51 ns |
-| dformat_unchecked! - simple - 7 args | 235 ns |
 | format! - simple - 1 arg | 30 ns |
-| format! - simple - 7 args | 174 ns |
 | Manual via template - simple - 1 arg | 49 ns |
-| Manual via template - simple - 7 args | 250 ns |
 | Manual via template unchecked - simple - 1 arg | 46 ns |
+| dformat! - simple - 7 args | 260 ns |
+| dformat_unchecked! - simple - 7 args | 235 ns |
+| format! - simple - 7 args | 174 ns |
+| Manual via template - simple - 7 args | 250 ns |
 | Manual via template unchecked - simple - 7 args | 173 ns |
 | dformat! - complex | 1040 ns |
 | dformat_unchecked! - complex | 952 ns |
