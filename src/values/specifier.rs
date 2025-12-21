@@ -1,7 +1,7 @@
 use core::fmt::Write;
 
 use crate::{
-    ArgumentKey,
+    ArgumentKey, Error,
     values::{Alignment, Precision, Type, Width},
 };
 
@@ -18,23 +18,32 @@ pub struct Specifier {
 }
 
 impl Specifier {
-    pub fn parse(input: &str, internal_index: &mut usize) -> Self {
+    pub fn parse(input: &str, internal_index: &mut usize) -> Result<Self, Error> {
         // Parsing the specifier first, because if it contains a precision .*
         // then the index of the precision argument is before the omitted argument index
         // Format: [argument_index][name][':' [fill][align][sign]['#']['0'][width]['.' precision][type]]
         let mut current_specifier_index = 0;
         let chars = input.as_bytes();
-        let current_char = input.len() - 1;
 
-        let fill_character = match (
-            chars[current_specifier_index],
-            chars[current_specifier_index + 1],
-        ) {
-            (char, b'<') | (char, b'^') | (char, b'>') => {
-                current_specifier_index += 1;
-                char as char
+        if input.len() == 0 {
+            return Ok(Specifier::default());
+        }
+
+        let input_end_index = input.len() - 1;
+
+        let fill_character = if input.len() > 2 {
+            match (
+                chars[current_specifier_index],
+                chars[current_specifier_index + 1],
+            ) {
+                (char, b'<') | (char, b'^') | (char, b'>') => {
+                    current_specifier_index += 1;
+                    char as char
+                }
+                _ => ' ',
             }
-            _ => ' ',
+        } else {
+            ' '
         };
         let alignment = match chars[current_specifier_index] {
             b'<' => {
@@ -73,7 +82,7 @@ impl Specifier {
             _ => false,
         };
         let width = {
-            if (chars[current_specifier_index] as char).is_digit(10) {
+            if input.len() > 1 && (chars[current_specifier_index] as char).is_digit(10) {
                 let mut until_index = current_specifier_index;
                 while (chars[until_index] as char).is_digit(10) {
                     until_index += 1;
@@ -81,9 +90,9 @@ impl Specifier {
                 let amount_str = &input[current_specifier_index..until_index];
                 current_specifier_index = until_index;
                 Width::Fixed(amount_str.parse::<u16>().unwrap())
-            } else if chars[current_specifier_index].is_ascii_alphabetic() {
+            } else if input.len() > 1 && chars[current_specifier_index].is_ascii_alphabetic() {
                 let end_index = current_specifier_index
-                    + input[current_specifier_index..current_char]
+                    + input[current_specifier_index..input_end_index]
                         .find('$')
                         .unwrap();
 
@@ -97,7 +106,7 @@ impl Specifier {
 
         let precision = if chars[current_specifier_index] == b'.' {
             current_specifier_index += 1;
-            if (chars[current_specifier_index] as char).is_digit(10) {
+            if input.len() > 1 && (chars[current_specifier_index] as char).is_digit(10) {
                 let mut until_index = current_specifier_index;
                 while (chars[until_index] as char).is_digit(10) {
                     until_index += 1;
@@ -105,9 +114,9 @@ impl Specifier {
                 let amount_str = &input[current_specifier_index..until_index];
                 current_specifier_index = until_index;
                 Precision::Fixed(amount_str.parse::<u16>().unwrap())
-            } else if chars[current_specifier_index].is_ascii_alphabetic() {
+            } else if input.len() > 1 && chars[current_specifier_index].is_ascii_alphabetic() {
                 let end_index = current_specifier_index
-                    + input[current_specifier_index..current_char]
+                    + input[current_specifier_index..input_end_index]
                         .find('$')
                         .unwrap();
 
@@ -135,7 +144,7 @@ impl Specifier {
             _ => Type::Display,
         };
 
-        Specifier {
+        Ok(Specifier {
             ty: ty,
             alternate_form: alternate_form,
             fill_character: fill_character,
@@ -144,7 +153,7 @@ impl Specifier {
             pad_zero: pad_zero,
             width: width,
             precision: precision,
-        }
+        })
     }
 
     #[cfg(feature = "nightly_formatting_options")]

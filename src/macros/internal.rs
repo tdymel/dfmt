@@ -73,14 +73,14 @@ macro_rules! __internal__dfmt_process {
                 Ok($crate::ArgumentValue::Display(self.0))
             }
         }
-        impl<'a, T: core::fmt::Debug> BlackMagic<'a> for &&&&&&&&WrappedArg<'a, T> {
-            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
-                Ok($crate::ArgumentValue::Debug(self.0))
-            }
-        }
-        impl<'a, T: core::fmt::LowerHex> BlackMagic<'a> for &&&&&&&WrappedArg<'a, T> {
+        impl<'a, T: core::fmt::LowerHex> BlackMagic<'a> for &&&&&&&&WrappedArg<'a, T> {
             fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
                 Ok($crate::ArgumentValue::LowerHex(self.0))
+            }
+        }
+        impl<'a, T: core::fmt::Debug> BlackMagic<'a> for &&&&&&&WrappedArg<'a, T> {
+            fn to_argument_value(&self) -> Result<$crate::ArgumentValue<'a>, $crate::Error> {
+                Ok($crate::ArgumentValue::Debug(self.0))
             }
         }
         impl<'a, T: core::fmt::UpperHex> BlackMagic<'a> for &&&&&&WrappedArg<'a, T> {

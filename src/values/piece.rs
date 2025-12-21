@@ -32,19 +32,21 @@ impl Piece {
                 }
                 b'{' | b'}' => match (bracket, char) {
                     (None, _) => {
-                        if cursor + 1 < current_char {
+                        if cursor < current_char {
                             pieces.push(Piece::Literal(input[cursor..current_char].to_string()));
                         }
                         bracket = Some(char);
                         cursor = current_char;
                     }
                     (Some(b'{'), b'}') => {
-                        let specifier = separator.map(|seperator_index| {
-                            Specifier::parse(
+                        let specifier = if let Some(seperator_index) = separator {
+                            Some(Specifier::parse(
                                 &input[seperator_index + 1..current_char],
                                 &mut internal_index,
-                            )
-                        });
+                            )?)
+                        } else {
+                            None
+                        };
 
                         let key = {
                             let (name_start, name_end) = match separator {

@@ -5,10 +5,6 @@ TODO:
 - Write documentation with examples
 - Write Tests (Also test non ascii templates)
 - Write Benchmarks
-- Implement and test no_std support
-
-- Add an API with the specialization feature
-- Better handling of dynamic precision and width
 
 - Finalize Readme
 - Fix Contributing
@@ -17,6 +13,10 @@ TODO:
 - Publish crate
 
 - The specifier Parser is not very robust yet
+
+# Long Shots
+- Implement and test no_std support
+- Find out how to write an api like format([k,v]) where k is any key and v is any value without wrapping it in ArgumentValue
 */
 
 mod error;

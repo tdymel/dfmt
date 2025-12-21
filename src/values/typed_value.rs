@@ -16,9 +16,6 @@ impl<'ct> core::fmt::Display for TypedValue<'ct> {
                 core::fmt::Binary::fmt(value, formatter)
             }
             (ArgumentValue::Octal(value), Type::Octal) => core::fmt::Octal::fmt(value, formatter),
-            (ArgumentValue::Pointer(value), Type::Pointer) => {
-                core::fmt::Pointer::fmt(value, formatter)
-            }
             (ArgumentValue::LowerExp(value), Type::LowerExp) => {
                 core::fmt::LowerExp::fmt(value, formatter)
             }
@@ -72,6 +69,45 @@ impl<'ct> core::fmt::Display for TypedValue<'ct> {
             }
             (ArgumentValue::FloatLike(value), Type::UpperExp) => {
                 core::fmt::UpperExp::fmt(value, formatter)
+            }
+            // Everything supports the pointer type
+            (ArgumentValue::Pointer(value), Type::Pointer) => {
+                core::fmt::Pointer::fmt(value, formatter)
+            }
+            (ArgumentValue::Display(value), Type::Pointer) => {
+                core::fmt::Pointer::fmt(value, formatter)
+            }
+            (ArgumentValue::Debug(value), Type::Pointer) => {
+                println!("RUN INTO DEBUG");
+                core::fmt::Pointer::fmt(value, formatter)
+            }
+            (ArgumentValue::Binary(value), Type::Pointer) => {
+                core::fmt::Pointer::fmt(value, formatter)
+            }
+            (ArgumentValue::Octal(value), Type::Pointer) => {
+                core::fmt::Pointer::fmt(value, formatter)
+            }
+            (ArgumentValue::LowerExp(value), Type::Pointer) => {
+                core::fmt::Pointer::fmt(value, formatter)
+            }
+            (ArgumentValue::UpperExp(value), Type::Pointer) => {
+                core::fmt::Pointer::fmt(value, formatter)
+            }
+            (ArgumentValue::LowerHex(value), Type::Pointer) => {
+                println!("RUN INTO HERE");
+                core::fmt::Pointer::fmt(value, formatter)
+            }
+            (ArgumentValue::UpperHex(value), Type::Pointer) => {
+                core::fmt::Pointer::fmt(value, formatter)
+            }
+            (ArgumentValue::DisplayAndDebug(value), Type::Pointer) => {
+                core::fmt::Pointer::fmt(value, formatter)
+            }
+            (ArgumentValue::IntegerLike(value), Type::Pointer) => {
+                core::fmt::Pointer::fmt(value, formatter)
+            }
+            (ArgumentValue::FloatLike(value), Type::Pointer) => {
+                core::fmt::Pointer::fmt(value, formatter)
             }
             _ => unreachable!(),
         }

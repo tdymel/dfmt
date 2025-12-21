@@ -23,7 +23,7 @@ impl Default for ArgumentTypeRequirements {
             lower_hex: Default::default(),
             upper_hex: Default::default(),
             binary: Default::default(),
-            pointer: Default::default(),
+            pointer: true,
             octal: Default::default(),
         }
     }
