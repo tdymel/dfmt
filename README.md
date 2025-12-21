@@ -44,6 +44,7 @@ Obviously, we can't do const folding, as the compiler can.
 * When creating the `Arguments` structure, a vector is allocated for the arguments. This is barely noticeable for many arguments.
 * While the template parsing is fast, you can just **create it once and then reuse it** for multiple arguments.
 * Right now padding a string with a fill character will cost some overhead.
+* If a pattern reuses an argument multiple times, we will push a typed version of this value multiple times right now. This allocates more memory, but is required to provide a convinient API.
 
 ### Nightly
 If you are on nightly, you can opt in to the `nightly_formatting_options` feature to further improve the performance, 
@@ -51,6 +52,9 @@ especially for the fill character case and to reduce compilation complexity.
 
 ### Benchmarks
 `dfmt` is not as fast as `format!` yet, but I think it should be possible to be at least as fast as the `format!` equivalent with dynamic args with further optimization.
+
+TODO: Order by whats fastest and then show % change
+
 
 | Bechmark | Runtime performance |
 | -------- | ------------------- |
