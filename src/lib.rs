@@ -5,7 +5,6 @@ TODO:
 - Write documentation with examples
 
 - Finalize Readme
-- Fix Contributing
 
 - Create CI/CD
 - Publish crate
