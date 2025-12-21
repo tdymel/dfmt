@@ -70,7 +70,7 @@ fn format_perf(c: &mut Criterion) {
 
     c.bench_function("format via macro", |b| {
         b.iter(|| {
-            dformat_unchecked!(
+            dformat!(
                 compiled_template,
                 arg1,
                 magic_number,

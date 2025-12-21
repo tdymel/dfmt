@@ -1,6 +1,6 @@
 use core::fmt::Write;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Type {
     Binary,
     Octal,
@@ -11,6 +11,7 @@ pub enum Type {
     UpperExp,
     Debug,
     Display,
+    WidthOrPrecisionAmount,
 }
 
 impl core::fmt::Display for Type {
@@ -24,7 +25,7 @@ impl core::fmt::Display for Type {
             Type::LowerExp => f.write_char('e'),
             Type::UpperExp => f.write_char('E'),
             Type::Debug => f.write_char('?'),
-            Type::Display => Ok(()),
+            Type::Display | Type::WidthOrPrecisionAmount => Ok(()),
         }
     }
 }

@@ -1,6 +1,6 @@
 use core::fmt::{Binary, Debug, Display, LowerExp, LowerHex, Octal, Pointer, UpperExp, UpperHex};
 
-use crate::{ArgumentTypeRequirements, values::Type};
+use crate::values::Type;
 
 pub enum ArgumentValue<'ct> {
     Display(&'ct dyn Display),
@@ -12,81 +12,80 @@ pub enum ArgumentValue<'ct> {
     UpperHex(&'ct dyn UpperHex),
     Octal(&'ct dyn Octal),
     Pointer(&'ct dyn Pointer),
-
-    DynPointer(&'ct dyn DynPointer),
-
-    DisplayAndDebug(&'ct dyn DisplayAndDebug),
-    IntegerLike(&'ct dyn IntegerLike),
-    FloatLike(&'ct dyn FloatLike),
+    WidthOrPrecisionAmount(&'ct dyn WidthOrPrecisionAmount),
 }
 
 impl<'ct> ArgumentValue<'ct> {
     pub fn to_u16(&self) -> Option<u16> {
         match self {
-            ArgumentValue::Display(value) => value.to_string().parse::<u16>().ok(),
-            ArgumentValue::DisplayAndDebug(value) => value.to_string().parse::<u16>().ok(),
-            ArgumentValue::IntegerLike(value) => value.to_string().parse::<u16>().ok(),
+            ArgumentValue::WidthOrPrecisionAmount(value) => Some(value.to_u16()),
             _ => None,
         }
     }
 
-    pub fn fullfills(&self) -> ArgumentTypeRequirements {
-        let mut requirements = ArgumentTypeRequirements::default();
+    pub fn to_type(&self) -> Type {
         match self {
-            ArgumentValue::Display(_) => requirements.add_requirement(Type::Display),
-            ArgumentValue::Debug(_) => requirements.add_requirement(Type::Debug),
-            ArgumentValue::Binary(_) => requirements.add_requirement(Type::Binary),
-            ArgumentValue::LowerExp(_) => requirements.add_requirement(Type::LowerExp),
-            ArgumentValue::UpperExp(_) => requirements.add_requirement(Type::UpperExp),
-            ArgumentValue::LowerHex(_) => requirements.add_requirement(Type::LowerHex),
-            ArgumentValue::UpperHex(_) => requirements.add_requirement(Type::UpperHex),
-            ArgumentValue::Octal(_) => requirements.add_requirement(Type::Octal),
-            ArgumentValue::Pointer(_) => requirements.add_requirement(Type::Pointer),
-            ArgumentValue::DynPointer(_) => requirements.add_requirement(Type::Pointer),
-            ArgumentValue::DisplayAndDebug(_) => {
-                requirements.add_requirement(Type::Display);
-                requirements.add_requirement(Type::Debug);
-            }
-            ArgumentValue::IntegerLike(_) => {
-                requirements.add_requirement(Type::Display);
-                requirements.add_requirement(Type::Debug);
-                requirements.add_requirement(Type::Binary);
-                requirements.add_requirement(Type::Octal);
-                requirements.add_requirement(Type::LowerExp);
-                requirements.add_requirement(Type::UpperExp);
-                requirements.add_requirement(Type::LowerHex);
-                requirements.add_requirement(Type::UpperHex);
-            }
-            ArgumentValue::FloatLike(_) => {
-                requirements.add_requirement(Type::Display);
-                requirements.add_requirement(Type::Debug);
-                requirements.add_requirement(Type::LowerExp);
-                requirements.add_requirement(Type::UpperExp);
-            }
-        };
-        requirements
+            ArgumentValue::Display(_) => Type::Display,
+            ArgumentValue::Debug(_) => Type::Debug,
+            ArgumentValue::Binary(_) => Type::Binary,
+            ArgumentValue::LowerExp(_) => Type::LowerExp,
+            ArgumentValue::UpperExp(_) => Type::UpperExp,
+            ArgumentValue::LowerHex(_) => Type::LowerHex,
+            ArgumentValue::UpperHex(_) => Type::UpperHex,
+            ArgumentValue::Octal(_) => Type::Octal,
+            ArgumentValue::Pointer(_) => Type::Pointer,
+            ArgumentValue::WidthOrPrecisionAmount(_) => Type::WidthOrPrecisionAmount,
+        }
     }
 }
 
-pub trait DynPointer: Pointer {
-    fn dyn_fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result;
-}
-impl<T> DynPointer for T where T: Pointer {
-    fn dyn_fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        self.fmt(f)
+impl<'ct> core::fmt::Display for ArgumentValue<'ct> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        match self {
+            ArgumentValue::Display(display) => (*display).fmt(f),
+            ArgumentValue::Debug(debug) => (*debug).fmt(f),
+            ArgumentValue::Binary(binary) => (*binary).fmt(f),
+            ArgumentValue::LowerExp(lower_exp) => (*lower_exp).fmt(f),
+            ArgumentValue::UpperExp(upper_exp) => (*upper_exp).fmt(f),
+            ArgumentValue::LowerHex(lower_hex) => (*lower_hex).fmt(f),
+            ArgumentValue::UpperHex(upper_hex) => (*upper_hex).fmt(f),
+            ArgumentValue::Octal(octal) => (*octal).fmt(f),
+            ArgumentValue::Pointer(pointer) => (*pointer).fmt(f),
+            ArgumentValue::WidthOrPrecisionAmount(_) => {
+                unreachable!()
+            }
+        }
     }
 }
 
-pub trait DisplayAndDebug: Display + Debug {}
-impl<T> DisplayAndDebug for T where T: Display + Debug {}
-pub trait IntegerLike:
-    Display + Debug + LowerExp + UpperExp + LowerHex + UpperHex + Binary + Octal
-{
-}
-impl<T> IntegerLike for T where
-    T: Display + Debug + LowerExp + UpperExp + LowerHex + UpperHex + Binary + Octal
-{
+pub trait WidthOrPrecisionAmount {
+    fn to_u16(&self) -> u16;
 }
 
-pub trait FloatLike: Display + Debug + LowerExp + UpperExp {}
-impl<T> FloatLike for T where T: Display + Debug + LowerExp + UpperExp {}
+macro_rules! impl_width_or_precision_amount {
+    (true, $ty:ty) => {
+        impl WidthOrPrecisionAmount for $ty {
+            fn to_u16(&self) -> u16 {
+                *self as u16
+            }
+        }
+    };
+    (false, $ty:ty) => {
+        impl WidthOrPrecisionAmount for $ty {
+            fn to_u16(&self) -> u16 {
+                if *self < 0 { 0 } else { *self as u16 }
+            }
+        }
+    };
+}
+
+impl_width_or_precision_amount!(false, i8);
+impl_width_or_precision_amount!(true, u8);
+impl_width_or_precision_amount!(false, i16);
+impl_width_or_precision_amount!(true, u16);
+impl_width_or_precision_amount!(false, i32);
+impl_width_or_precision_amount!(true, u32);
+impl_width_or_precision_amount!(false, i64);
+impl_width_or_precision_amount!(true, u64);
+impl_width_or_precision_amount!(false, i128);
+impl_width_or_precision_amount!(true, u128);

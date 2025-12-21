@@ -1,3 +1,16 @@
+use crate::values::Type;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TypedArgumentKey {
+    pub key: ArgumentKey,
+    pub ty: Type,
+}
+
+impl TypedArgumentKey {
+    pub fn new(key: ArgumentKey, ty: Type) -> Self {
+        Self { key, ty }
+    }
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ArgumentKey {

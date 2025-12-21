@@ -28,6 +28,7 @@ test_dformat!(ty_debug, "{:?}", TestStruct {});
 test_dformat!(ty_binary, "{:b}", 42);
 test_dformat!(ty_octal, "{:o}", 42);
 test_dformat!(ty_pointer, "{:p}", TEST_POINTER);
+test_dformat!(ty_precision, "{:.prec$}", 32.23322323, prec = 3);
 
 // #[test]
 // fn dformat() {

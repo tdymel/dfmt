@@ -1,6 +1,6 @@
 use crate::{
     ArgumentKey, ArgumentValue, Error, Template, ToArgumentKey,
-    values::{Alignment, Piece, Precision, Specifier, Type, TypedValue, Width},
+    values::{Alignment, Piece, Precision, Specifier, Type, TypedArgumentKey, Width},
 };
 use core::fmt::Write;
 
@@ -17,12 +17,16 @@ impl<'ct> Arguments<'ct> {
         }
     }
 
-    fn find_argument_value(&self, key: &ArgumentKey) -> Result<&ArgumentValue<'ct>, Error> {
+    fn find_argument_value(
+        &self,
+        key: &ArgumentKey,
+        ty: &Type,
+    ) -> Result<&ArgumentValue<'ct>, Error> {
         self.argument_values
             .iter()
-            .find(|it| &it.0 == key)
+            .find(|it| &it.0 == key && &it.1.to_type() == ty)
             .map(|it| &it.1)
-            .ok_or_else(|| Error::ArgumentNotFound(key.clone()))
+            .ok_or_else(|| Error::ArgumentForTypeNotFound(TypedArgumentKey::new(key.clone(), *ty)))
     }
 
     pub fn format(&self) -> Result<String, Error> {
@@ -44,11 +48,14 @@ impl<'ct> Arguments<'ct> {
                 Piece::BracketOpen => result.push('{'),
                 Piece::BracketClose => result.push('}'),
                 Piece::Argument { key, specifier } => {
-                    let argument_value = self.find_argument_value(key)?;
+                    let ty = specifier.as_ref().map(|it| it.ty).unwrap_or(Type::Display);
+                    let argument_value = self.find_argument_value(key, &ty)?;
 
                     let dynamic_width = if let Some(specifier) = specifier {
                         match &specifier.width {
-                            Width::Dynamic(key) => self.find_argument_value(key)?.to_u16(),
+                            Width::Dynamic(key) => self
+                                .find_argument_value(key, &Type::WidthOrPrecisionAmount)?
+                                .to_u16(),
                             Width::Fixed(amount) => Some(*amount),
                         }
                     } else {
@@ -57,7 +64,9 @@ impl<'ct> Arguments<'ct> {
 
                     let dynamic_precision = if let Some(specifier) = specifier {
                         match &specifier.precision {
-                            Precision::Dynamic(key) => self.find_argument_value(key)?.to_u16(),
+                            Precision::Dynamic(key) => self
+                                .find_argument_value(key, &Type::WidthOrPrecisionAmount)?
+                                .to_u16(),
                             Precision::Fixed(amount) => Some(*amount),
                             Precision::Auto => None,
                         }
@@ -68,10 +77,7 @@ impl<'ct> Arguments<'ct> {
                     write_argument_value(
                         &mut result,
                         specifier.as_ref(),
-                        &TypedValue {
-                            argument_value,
-                            ty: specifier.as_ref().map(|it| it.ty).unwrap_or(Type::Display),
-                        },
+                        argument_value,
                         dynamic_width,
                         dynamic_precision,
                     )
@@ -90,18 +96,18 @@ impl<'ct> Arguments<'ct> {
         value: ArgumentValue<'ct>,
     ) -> Result<(), Error> {
         let argument_key = key.to_argument_key();
+        let ty = value.to_type();
         if self
             .argument_values
             .iter()
-            .any(|(key, _)| key == &argument_key)
+            .any(|(key, val)| key == &argument_key && val.to_type() == ty)
         {
-            return Err(Error::DuplicateArgument(argument_key));
+            return Err(Error::DuplicateArgument(TypedArgumentKey::new(
+                argument_key,
+                ty,
+            )));
         }
 
-        // TODO: This Check is very expensive
-        value
-            .fullfills()
-            .requires(self.template.argument_type_requirements(&argument_key)?)?;
         self.argument_values.push((argument_key, value));
         Ok(())
     }
@@ -143,7 +149,7 @@ impl<'ct> core::fmt::Debug for Arguments<'ct> {
 fn write_argument_value(
     output: &mut String,
     specifier: Option<&Specifier>,
-    value: &TypedValue<'_>,
+    value: &ArgumentValue<'_>,
     width: Option<u16>,
     precision: Option<u16>,
 ) -> core::fmt::Result {
@@ -163,7 +169,7 @@ fn write_argument_value(
 fn write_argument_value(
     output: &mut String,
     specifier: Option<&Specifier>,
-    value: &TypedValue<'_>,
+    value: &ArgumentValue<'_>,
     width: Option<u16>,
     precision: Option<u16>,
 ) -> core::fmt::Result {

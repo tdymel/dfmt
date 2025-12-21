@@ -1,7 +1,4 @@
-use crate::{
-    ArgumentValue, Arguments, Error, ToArgumentKey,
-    values::{FloatLike, IntegerLike},
-};
+use crate::{ArgumentValue, Arguments, Error, ToArgumentKey};
 use core::fmt::{Binary, Debug, Display, LowerExp, LowerHex, Octal, Pointer, UpperExp, UpperHex};
 
 pub trait ArgumentsBuilder<'a> {
@@ -26,10 +23,6 @@ pub trait ArgumentsBuilder<'a> {
     fn lower_hex<T: LowerHex, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
 
     fn upper_hex<T: UpperHex, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
-    fn integer_like<T: IntegerLike, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
-    fn float_like<T: FloatLike, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
 }
 
 impl<'a> ArgumentsBuilder<'a> for Result<Arguments<'a>, Error> {
@@ -136,26 +129,6 @@ impl<'a> ArgumentsBuilder<'a> for Result<Arguments<'a>, Error> {
         args.add_argument_value(key, ArgumentValue::UpperHex(value))?;
         Ok(args)
     }
-
-    fn integer_like<T: IntegerLike, K: ToArgumentKey>(
-        self,
-        key: K,
-        value: &'a T,
-    ) -> Result<Arguments<'a>, Error> {
-        let mut args = self?;
-        args.add_argument_value(key, ArgumentValue::IntegerLike(value))?;
-        Ok(args)
-    }
-
-    fn float_like<T: FloatLike, K: ToArgumentKey>(
-        self,
-        key: K,
-        value: &'a T,
-    ) -> Result<Arguments<'a>, Error> {
-        let mut args = self?;
-        args.add_argument_value(key, ArgumentValue::FloatLike(value))?;
-        Ok(args)
-    }
 }
 pub trait UncheckedArgumentsBuilder<'a> {
     fn argument_value_unchecked<K: ToArgumentKey>(self, key: K, value: ArgumentValue<'a>) -> Self;
@@ -177,11 +150,6 @@ pub trait UncheckedArgumentsBuilder<'a> {
     fn lower_hex_unchecked<T: LowerHex, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
 
     fn upper_hex_unchecked<T: UpperHex, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
-
-    fn integer_like_unchecked<T: IntegerLike, K: ToArgumentKey>(self, key: K, value: &'a T)
-    -> Self;
-
-    fn float_like_unchecked<T: FloatLike, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;
 }
 
 impl<'a> UncheckedArgumentsBuilder<'a> for Arguments<'a> {
@@ -272,24 +240,6 @@ impl<'a> UncheckedArgumentsBuilder<'a> for Arguments<'a> {
         value: &'a T,
     ) -> Arguments<'a> {
         self.add_argument_value_unchecked(key, ArgumentValue::UpperHex(value));
-        self
-    }
-
-    fn integer_like_unchecked<T: IntegerLike, K: ToArgumentKey>(
-        mut self,
-        key: K,
-        value: &'a T,
-    ) -> Arguments<'a> {
-        self.add_argument_value_unchecked(key, ArgumentValue::IntegerLike(value));
-        self
-    }
-
-    fn float_like_unchecked<T: FloatLike, K: ToArgumentKey>(
-        mut self,
-        key: K,
-        value: &'a T,
-    ) -> Arguments<'a> {
-        self.add_argument_value_unchecked(key, ArgumentValue::FloatLike(value));
         self
     }
 }

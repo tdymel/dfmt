@@ -14,9 +14,7 @@ TODO:
 
 - The specifier Parser is not very robust yet
 
-- Maybe I should go back the requirements based parsing of args
-- I should consider to add custom types like the pointer as well to the other types, but not sure if tis required outside of this special case.
-  => Maybe if I implement my custom debug like this, I can get rid of the dynamic dispath part and get the right pointer for everything
+- Find out where the dformat_unchecked overhead comes from
 
 # Long Shots
 - Implement and test no_std support
@@ -32,4 +30,6 @@ pub use error::Error;
 pub use materials::{
     Arguments, ArgumentsBuilder, DynFmt, Template, ToTemplate, UncheckedArgumentsBuilder,
 };
-pub use values::{ArgumentKey, ArgumentTypeRequirements, ArgumentValue, DynPointer, ToArgumentKey};
+pub use values::{
+    ArgumentKey, ArgumentTypeRequirements, ArgumentValue, ToArgumentKey, WidthOrPrecisionAmount,
+};

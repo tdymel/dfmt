@@ -1,4 +1,4 @@
-use crate::{Error, values::Type};
+use crate::values::Type;
 
 #[derive(Debug, Clone, Copy)]
 pub struct ArgumentTypeRequirements {
@@ -11,6 +11,7 @@ pub struct ArgumentTypeRequirements {
     pub binary: bool,
     pub pointer: bool,
     pub octal: bool,
+    pub width_or_precision_amount: bool,
 }
 
 impl Default for ArgumentTypeRequirements {
@@ -25,6 +26,7 @@ impl Default for ArgumentTypeRequirements {
             binary: Default::default(),
             pointer: Default::default(),
             octal: Default::default(),
+            width_or_precision_amount: Default::default(),
         }
     }
 }
@@ -41,22 +43,7 @@ impl ArgumentTypeRequirements {
             Type::UpperExp => self.upper_exp = true,
             Type::Debug => self.debug = true,
             Type::Display => self.display = true,
+            Type::WidthOrPrecisionAmount => self.width_or_precision_amount = true,
         };
-    }
-
-    pub fn requires(&self, other: &Self) -> Result<(), Error> {
-        if (!other.display || self.display)
-            && (!other.debug || self.debug)
-            && (!other.lower_exp || self.lower_exp)
-            && (!other.upper_exp || self.upper_exp)
-            && (!other.lower_hex || self.lower_hex)
-            && (!other.upper_hex || self.upper_hex)
-            && (!other.binary || self.binary)
-            && (!other.pointer || self.pointer)
-            && (!other.octal || self.octal)
-        {
-            return Ok(());
-        }
-        Err(Error::ArgumentDoesNotMeetRequirements(*other, *self))
     }
 }
