@@ -20,10 +20,10 @@ impl Template {
                 if let Some(specifier) = specifier {
                     Template::add_requirement(&mut requirements, key, specifier.ty);
                     if let Precision::Dynamic(precision_key) = &specifier.precision {
-                        Template::add_requirement(&mut requirements, precision_key, Type::Display);
+                        Template::add_requirement(&mut requirements, precision_key, Type::WidthOrPrecisionAmount);
                     }
                     if let Width::Dynamic(width_key) = &specifier.width {
-                        Template::add_requirement(&mut requirements, width_key, Type::Display);
+                        Template::add_requirement(&mut requirements, width_key, Type::WidthOrPrecisionAmount);
                     }
                 } else {
                     Template::add_requirement(&mut requirements, key, Type::Display);
@@ -55,10 +55,10 @@ impl Template {
         let argument_key = key.to_argument_key();
         Template::add_requirement(&mut self.requirements, &argument_key, specifier.ty);
         if let Precision::Dynamic(precision_key) = &specifier.precision {
-            Template::add_requirement(&mut self.requirements, precision_key, Type::Display);
+            Template::add_requirement(&mut self.requirements, precision_key, Type::WidthOrPrecisionAmount);
         }
         if let Width::Dynamic(width_key) = &specifier.width {
-            Template::add_requirement(&mut self.requirements, width_key, Type::Display);
+            Template::add_requirement(&mut self.requirements, width_key, Type::WidthOrPrecisionAmount);
         }
         self.pieces.push(Piece::Argument {
             key: argument_key,

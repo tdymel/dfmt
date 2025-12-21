@@ -1,6 +1,4 @@
-#![feature(formatting_options)]
-
-use dfmt::{Template, dformat, dformat_unchecked, dprint, dprintln};
+use dfmt::dformat;
 
 #[derive(Debug)]
 struct TestStruct;
@@ -21,163 +19,55 @@ macro_rules! test_dformat {
 }
 
 test_dformat!(with_literal_pieces, "Hello, {}!", "world");
-test_dformat!(named_arg, "{arg} {}", "Hello", arg = 42);
+test_dformat!(with_non_ascii_chars, "Привет, {}!", "мир");
+test_dformat!(with_non_ascii_chars_2, "Привет, {:^50}!", "мир");
+test_dformat!(named_arg, "{arg} {} {0}", "Hello", arg = 42);
 test_dformat!(indexed_arg, "{0} {1} {0}", 42, "Hello");
 test_dformat!(empty_spec, "{:}", "Hello");
 test_dformat!(ty_debug, "{:?}", TestStruct {});
 test_dformat!(ty_binary, "{:b}", 42);
 test_dformat!(ty_octal, "{:o}", 42);
 test_dformat!(ty_pointer, "{:p}", TEST_POINTER);
-test_dformat!(ty_precision, "{:.prec$}", 32.23322323, prec = 3);
-
-// #[test]
-// fn dformat() {
-//     assert_eq!(
-//         dformat!("Hello, {}!".to_string(), "world").unwrap(),
-//         format!("Hello, {}!", "world")
-//     );
-//     assert_eq!(
-//         dformat!("{1}, {0}!".to_string(), "world", "Hello").unwrap(),
-//         format!("{1}, {0}!", "world", "Hello")
-//     );
-//     assert_eq!(
-//         dformat!(
-//             "{greeting}, {name}!".to_string(),
-//             greeting = "Hello",
-//             name = "world"
-//         )
-//         .unwrap(),
-//         format!("{greeting}, {name}!", greeting = "Hello", name = "world")
-//     );
-//     assert_eq!(
-//         dformat!("{:?}".to_string(), TestStruct).unwrap(),
-//         format!("{:?}", TestStruct)
-//     );
-//     assert_eq!(dformat!("{}", 42).unwrap(), format!("{}", 42));
-//     assert_eq!(dformat!("{:}", 42).unwrap(), format!("{:}", 42));
-
-//     let precision = 3;
-//     assert_eq!(
-//         dformat!("{:.prec$}".to_string(), 1.23456, prec = precision).unwrap(),
-//         format!("{:.3}", 1.23456)
-//     );
-//     assert_eq!(
-//         dformat!("{:.1$}".to_string(), 1.23456, 3).unwrap(),
-//         format!("{:.3}", 1.23456)
-//     );
-
-//     let width = 5;
-//     assert_eq!(
-//         dformat!("{:width$}".to_string(), 42, width = width).unwrap(),
-//         format!("{:5}", 42)
-//     );
-//     assert_eq!(
-//         dformat!("{:1$}".to_string(), 42, 5).unwrap(),
-//         format!("{:5}", 42)
-//     );
-//     assert_eq!(
-//         dformat!("{:5}".to_string(), 42).unwrap(),
-//         format!("{:5}", 42)
-//     );
-
-//     assert_eq!(
-//         dformat!("{:x}".to_string(), 255).unwrap(),
-//         format!("{:x}", 255)
-//     );
-//     assert_eq!(
-//         dformat!("{:o}".to_string(), 255).unwrap(),
-//         format!("{:o}", 255)
-//     );
-//     assert_eq!(
-//         dformat!("{:b}".to_string(), 255).unwrap(),
-//         format!("{:b}", 255)
-//     );
-
-//     assert_eq!(
-//         dformat!("{:.2}".to_string(), 3.14159).unwrap(),
-//         format!("{:.2}", 3.14159)
-//     );
-//     assert_eq!(
-//         dformat!("{:e}".to_string(), 1234.56).unwrap(),
-//         format!("{:e}", 1234.56)
-//     );
-
-//     assert_eq!(
-//         dformat!("{:<5}".to_string(), 42).unwrap(),
-//         format!("{:<5}", 42)
-//     );
-//     assert_eq!(
-//         dformat!("{:>5}".to_string(), 42).unwrap(),
-//         format!("{:>5}", 42)
-//     );
-//     assert_eq!(
-//         dformat!("{:^5}".to_string(), 42).unwrap(),
-//         format!("{:^5}", 42)
-//     );
-
-//     assert_eq!(
-//         dformat!("{:*<5}".to_string(), 42).unwrap(),
-//         format!("{:*<5}", 42)
-//     );
-//     assert_eq!(
-//         dformat!("{:*>5}".to_string(), 42).unwrap(),
-//         format!("{:*>5}", 42)
-//     );
-//     assert_eq!(
-//         dformat!("{:*^5}".to_string(), 42).unwrap(),
-//         format!("{:*^5}", 42)
-//     );
-
-//     assert_eq!(
-//         dformat!("{:*>5.2}".to_string(), 42.567).unwrap(),
-//         format!("{:*>5.2}", 42.567)
-//     );
-//     assert_eq!(
-//         dformat!("{:.1$} and {:.*}".to_string(), 1.23456, 2, 5, 1.23456).unwrap(),
-//         format!("{:.2} and {:.5}", 1.23456, 1.23456)
-//     );
-
-//     assert_eq!(
-//         dformat!("{:#x}".to_string(), 255).unwrap(),
-//         format!("{:#x}", 255)
-//     );
-//     assert_eq!(
-//         dformat!("{:#b}".to_string(), 255).unwrap(),
-//         format!("{:#b}", 255)
-//     );
-//     assert_eq!(
-//         dformat!("{:#o}".to_string(), 255).unwrap(),
-//         format!("{:#o}", 255)
-//     );
-
-//     assert_eq!(
-//         dformat!("{:0>8}".to_string(), 42).unwrap(),
-//         format!("{:0>8}", 42)
-//     );
-//     assert_eq!(
-//         dformat!("{:0^8}".to_string(), 42).unwrap(),
-//         format!("{:0^8}", 42)
-//     );
-
-//     assert_eq!(
-//         dformat!("{:+}".to_string(), 42).unwrap(),
-//         format!("{:+}", 42)
-//     );
-//     assert_eq!(
-//         dformat!("{:+}".to_string(), -42).unwrap(),
-//         format!("{:+}", -42)
-//     );
-
-//     assert_eq!(
-//         dformat!("{:0>+#10x}".to_string(), 255).unwrap(),
-//         format!("{:0>+#10x}", 255)
-//     );
-//     assert_eq!(
-//         dformat!("{:<#10b}".to_string(), 255).unwrap(),
-//         format!("{:<#10b}", 255)
-//     );
-//     assert_eq!(
-//         dformat!("{:^#10o}".to_string(), 255).unwrap(),
-//         format!("{:^#10o}", 255)
-//     );
-// }
+test_dformat!(ty_lower_exp, "{:e}", 420000);
+test_dformat!(ty_upper_exp, "{:E}", 420000);
+test_dformat!(ty_lower_hex, "{:x}", 420000);
+test_dformat!(ty_upper_hex, "{:X}", 420000);
+test_dformat!(width, "{:w$}", 32.23322323, w = 3);
+test_dformat!(width_fixed, "{:20}", 32.23322323);
+test_dformat!(precision, "{:.prec$}", 32.23322323, prec = 3);
+test_dformat!(precision_fixed, "{:.20}", 32.23322323);
+test_dformat!(precision_dyn, "{:.*}", 4, 32.23322323);
+test_dformat!(ty_debug_alt, "{:#?}", TestStruct {});
+test_dformat!(ty_binary_alt, "{:#b}", 42);
+test_dformat!(ty_octal_alt, "{:#o}", 42);
+test_dformat!(ty_lower_hex_alt, "{:#x}", 420000);
+test_dformat!(ty_upper_hex_alt, "{:#X}", 420000);
+test_dformat!(zero_pad, "{:020}", 42);
+test_dformat!(align_left, "{:*<20}", 42);
+test_dformat!(align_center, "{:*^20}", 42);
+test_dformat!(align_right, "{:*>20}", 42);
+test_dformat!(sign_plus, "{:+}", 42);
+test_dformat!(sign_minus, "{:-}", 42);
+test_dformat!(float_with_precision_and_upper_e, "{:.3E}", 42.3232323232);
+test_dformat!(
+    float_with_precision_and_upper_e_var,
+    "{:.p$E}",
+    42.3232323232,
+    p = 3
+);
+test_dformat!(
+    float_with_precision_and_upper_e_dyn,
+    "{:.*E}",
+    3,
+    42.3232323232
+);
+test_dformat!(everything_1, "{arg:*>+#020.4o}", arg = 42);
+test_dformat!(everything_2, "{arg:*>+#020.4E}", arg = 42.232323);
+test_dformat!(
+    everything_3,
+    "{arg:*>+#0w$.p$E}",
+    arg = 42.232323,
+    w = 50,
+    p = 3
+);
+test_dformat!(everything_4, "{arg:*>+#0w$.*E}", 5, arg = 42.232323, w = 50);

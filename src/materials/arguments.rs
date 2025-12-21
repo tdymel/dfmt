@@ -138,7 +138,7 @@ impl<'ct> core::fmt::Debug for Arguments<'ct> {
                 &self
                     .argument_values
                     .iter()
-                    .map(|it| &it.0)
+                    .map(|it| (&it.0, it.1.to_type()))
                     .collect::<Vec<_>>(),
             )
             .finish()

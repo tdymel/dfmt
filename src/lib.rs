@@ -3,7 +3,6 @@
 /*
 TODO:
 - Write documentation with examples
-- Write Tests (Also test non ascii templates)
 - Write Benchmarks
 
 - Finalize Readme
@@ -12,9 +11,9 @@ TODO:
 - Create CI/CD
 - Publish crate
 
-- The specifier Parser is not very robust yet
-
 - Find out where the dformat_unchecked overhead comes from
+
+- Put long shots in an issue format on github
 
 # Long Shots
 - Implement and test no_std support
