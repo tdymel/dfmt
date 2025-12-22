@@ -96,7 +96,11 @@ impl Piece {
             pieces.push(Piece::Literal(input[cursor..current_char].to_string()));
         }
 
-        Ok(pieces)
+        if bracket.is_some() {
+            Err(Error::UnexpectedToken)
+        } else {
+            Ok(pieces)
+        }
     }
 }
 

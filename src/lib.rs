@@ -5,8 +5,6 @@
 TODO:
 - Create CI/CD
 - Publish crate
-
-- Test error cases
 */
 
 mod error;
@@ -20,5 +18,5 @@ pub use materials::{
 };
 pub use values::{
     Alignment, ArgumentKey, ArgumentTypeRequirements, ArgumentValue, Precision, Specifier,
-    ToArgumentKey, Type, Width, WidthOrPrecisionAmount,
+    ToArgumentKey, Type, TypedArgumentKey, Width, WidthOrPrecisionAmount,
 };

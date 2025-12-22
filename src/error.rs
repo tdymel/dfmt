@@ -3,7 +3,7 @@ use thiserror::Error;
 use crate::{ArgumentKey, values::TypedArgumentKey};
 
 /// Possible errors.
-#[derive(Error, Debug)]
+#[derive(Error, Debug, PartialEq, Eq)]
 pub enum Error {
     #[error("Argument value for key '{0:#?}' not found")]
     ArgumentForTypeNotFound(TypedArgumentKey),

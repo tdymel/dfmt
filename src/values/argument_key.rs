@@ -1,5 +1,6 @@
 use crate::values::Type;
 
+#[doc(hidden)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypedArgumentKey {
     pub key: ArgumentKey,

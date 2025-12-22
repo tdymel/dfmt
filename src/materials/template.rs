@@ -71,8 +71,8 @@ impl Template {
     }
 
     #[doc(hidden)]
-    pub fn to_template(&self) -> &Template {
-        self
+    pub fn to_template(&self) -> Result<&Self, Error> {
+        Ok(self)
     }
 
     /// Builder to add a literal piece.
@@ -156,17 +156,17 @@ impl core::fmt::Display for Template {
 
 #[doc(hidden)]
 pub trait ToTemplate {
-    fn to_template(self) -> Template;
+    fn to_template(self) -> Result<Template, Error>;
 }
 
 impl ToTemplate for Template {
-    fn to_template(self) -> Template {
-        self
+    fn to_template(self) -> Result<Template, Error> {
+        Ok(self)
     }
 }
 
 impl ToTemplate for &str {
-    fn to_template(self) -> Template {
-        Template::parse(self).unwrap()
+    fn to_template(self) -> Result<Template, Error> {
+        Template::parse(self)
     }
 }

@@ -7,7 +7,7 @@ macro_rules! __internal__dfmt {
             let template = {
                 use $crate::ToTemplate;
                 t.to_template()
-            };
+            }?;
             let mut arguments = template.arguments();
             $crate::__internal__dfmt_process_args!($checked, arguments, 0, $($args)*)?;
             arguments.format()
