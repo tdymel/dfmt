@@ -103,7 +103,7 @@ impl Piece {
 impl core::fmt::Display for Piece {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            Piece::Literal(literal) => f.write_str(&literal),
+            Piece::Literal(literal) => f.write_str(literal),
             Piece::BracketOpen => f.write_str("{{"),
             Piece::BracketClose => f.write_str("}}"),
             Piece::Argument { key, specifier } => {

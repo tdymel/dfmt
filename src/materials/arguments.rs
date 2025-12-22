@@ -44,7 +44,7 @@ impl<'ct> Arguments<'ct> {
 
         for piece in &self.template.pieces {
             match piece {
-                Piece::Literal(literal) => result.push_str(&literal),
+                Piece::Literal(literal) => result.push_str(literal),
                 Piece::BracketOpen => result.push('{'),
                 Piece::BracketClose => result.push('}'),
                 Piece::Argument { key, specifier } => {
@@ -81,7 +81,7 @@ impl<'ct> Arguments<'ct> {
                         dynamic_width,
                         dynamic_precision,
                     )
-                    .map_err(|err| Error::Fmt(err))?;
+                    .map_err(Error::Fmt)?;
                 }
             }
         }

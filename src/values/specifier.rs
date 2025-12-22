@@ -106,10 +106,10 @@ impl Specifier {
         let width = if remaining(current_specifier_index) > 0
             && chars[current_specifier_index] != b'.'
         {
-            if (chars[current_specifier_index] as char).is_digit(10) {
+            if (chars[current_specifier_index] as char).is_ascii_digit() {
                 let mut until_index = current_specifier_index;
                 while remaining(until_index + 1) > 0
-                    && (chars[until_index + 1] as char).is_digit(10)
+                    && (chars[until_index + 1] as char).is_ascii_digit()
                 {
                     until_index += 1;
                 }
@@ -134,10 +134,10 @@ impl Specifier {
             && chars[current_specifier_index] == b'.'
         {
             current_specifier_index += 1;
-            if (chars[current_specifier_index] as char).is_digit(10) {
+            if (chars[current_specifier_index] as char).is_ascii_digit() {
                 let mut until_index = current_specifier_index;
                 while remaining(until_index + 1) > 0
-                    && (chars[until_index + 1] as char).is_digit(10)
+                    && (chars[until_index + 1] as char).is_ascii_digit()
                 {
                     until_index += 1;
                 }
@@ -179,14 +179,14 @@ impl Specifier {
         };
 
         Ok(Specifier {
-            ty: ty,
-            alternate_form: alternate_form,
-            fill_character: fill_character,
-            alignment: alignment,
-            sign: sign,
-            pad_zero: pad_zero,
-            width: width,
-            precision: precision,
+            ty,
+            alternate_form,
+            fill_character,
+            alignment,
+            sign,
+            pad_zero,
+            width,
+            precision,
         })
     }
 
