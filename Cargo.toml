@@ -16,8 +16,8 @@ keywords = [
 categories = ["value-formatting", "text-processing"]
 description = "A fully featured dynamic drop in replacement for the format! macro."
 readme = "README.md"
-repository = "https://github.com/tdymel/dyn-str-fmt"
-documentation = "https://docs.rs/dyn-str-fmt"
+repository = "https://github.com/tdymel/dfmt"
+documentation = "https://docs.rs/dfmt"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
