@@ -5,12 +5,9 @@ version = "0.1.0"
 edition = "2024"
 keywords = [
     "dynamic",
-    "dyn",
     "format",
     "fmt",
     "string",
-    "str",
-    "args",
     "arguments",
 ]
 categories = ["value-formatting", "text-processing"]
