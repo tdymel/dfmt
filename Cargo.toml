@@ -13,7 +13,7 @@ keywords = [
     "args",
     "arguments",
 ]
-categories = ["no-std"]
+categories = []
 description = "A fully featured dynamic drop in replacement for the format! macro."
 readme = "README.md"
 repository = "https://github.com/tdymel/dyn-str-fmt"

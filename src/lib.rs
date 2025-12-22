@@ -4,13 +4,12 @@
 TODO:
 - Write documentation with examples
 
-- Finalize Readme
-
 - Create CI/CD
 - Publish crate
 
 - Find out where the dformat_unchecked overhead comes from
 
+- Add categories
 - Put long shots in an issue format on github
 
 # Long Shots

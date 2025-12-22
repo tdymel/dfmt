@@ -1,4 +1,4 @@
-use dfmt::dformat;
+use dfmt::{ArgumentValue, DynFmt, dformat, dprintln};
 
 #[derive(Debug)]
 struct TestStruct;
@@ -33,7 +33,11 @@ test_dformat!(ty_lower_exp, "{:e}", 420000);
 test_dformat!(ty_upper_exp, "{:E}", 420000);
 test_dformat!(ty_lower_hex, "{:x}", 420000);
 test_dformat!(ty_upper_hex, "{:X}", 420000);
-test_dformat!(same_value_multiple_ty, "{0} {0:b} {0:o} {0:e} {0:E} {0:x} {0:X} {0:?}", 42);
+test_dformat!(
+    same_value_multiple_ty,
+    "{0} {0:b} {0:o} {0:e} {0:E} {0:x} {0:X} {0:?}",
+    42
+);
 test_dformat!(width, "{:w$}", 32.23322323, w = 3);
 test_dformat!(width_fixed, "{:20}", 32.23322323);
 test_dformat!(precision, "{:.prec$}", 32.23322323, prec = 3);
