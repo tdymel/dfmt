@@ -1,4 +1,4 @@
-use crate::{ArgumentKey, ArgumentValue, Error, Template, ToArgumentKey, values::*};
+use crate::{values::*, ArgumentKey, ArgumentValue, Error, Template, ToArgumentKey};
 use core::fmt::Write;
 
 #[cfg(not(feature = "std"))]

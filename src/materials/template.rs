@@ -1,7 +1,7 @@
 use crate::{
-    ArgumentKey, ArgumentTypeRequirements, Arguments, ToArgumentKey,
     error::Error,
     values::{Piece, Precision, Specifier, Type, Width},
+    ArgumentKey, ArgumentTypeRequirements, Arguments, ToArgumentKey,
 };
 
 #[cfg(not(feature = "std"))]

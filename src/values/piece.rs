@@ -1,6 +1,6 @@
 use core::fmt::Write;
 
-use crate::{ArgumentKey, Error, values::Specifier};
+use crate::{values::Specifier, ArgumentKey, Error};
 
 #[cfg(not(feature = "std"))]
 use alloc::{

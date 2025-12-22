@@ -75,7 +75,11 @@ macro_rules! impl_width_or_precision_amount {
     (false, $ty:ty) => {
         impl WidthOrPrecisionAmount for $ty {
             fn to_u16(&self) -> u16 {
-                if *self < 0 { 0 } else { *self as u16 }
+                if *self < 0 {
+                    0
+                } else {
+                    *self as u16
+                }
             }
         }
     };

@@ -1,8 +1,8 @@
 use core::fmt::Write;
 
 use crate::{
-    ArgumentKey, Error,
     values::{Alignment, Precision, Type, Width},
+    ArgumentKey, Error,
 };
 
 #[cfg(not(feature = "std"))]
