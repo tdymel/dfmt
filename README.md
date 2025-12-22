@@ -31,6 +31,28 @@ let using_manual_builder_api = precompiled_template
     .format()
     .unwrap();
 println!("{}", using_manual_builder_api);
+
+let using_str_extension = "Hello, {0} {{{world}}} {} {day:y<width$}!"
+    .format(vec![
+        (
+            ArgumentKey::Index(0),
+            ArgumentValue::Display(&"what a nice"),
+        ),
+        (
+            ArgumentKey::Name("world".to_string()),
+            ArgumentValue::Display(&"world"),
+        ),
+        (
+            ArgumentKey::Name("day".to_string()),
+            ArgumentValue::Display(&"day"),
+        ),
+        (
+            ArgumentKey::Name("width".to_string()),
+            ArgumentValue::WidthOrPrecisionAmount(&20),
+        ),
+    ])
+    .unwrap();
+println!("{}", using_str_extension);
 ```
 
 ## Features

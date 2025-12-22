@@ -10,11 +10,6 @@ TODO:
 - Find out where the dformat_unchecked overhead comes from
 
 - Add categories
-- Put long shots in an issue format on github
-
-# Long Shots
-- Implement and test no_std support
-- Find out how to write an api like format([k,v]) where k is any key and v is any value without wrapping it in ArgumentValue
 */
 
 mod error;

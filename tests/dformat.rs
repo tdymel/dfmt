@@ -1,4 +1,4 @@
-use dfmt::{ArgumentValue, DynFmt, dformat, dprintln};
+use dfmt::dformat;
 
 #[derive(Debug)]
 struct TestStruct;
