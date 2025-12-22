@@ -4,6 +4,9 @@ use crate::{
     values::{Piece, Precision, Specifier, Type, Width},
 };
 
+#[cfg(not(feature = "std"))]
+use alloc::{string::ToString, vec::Vec};
+
 /// Precompiled version of the string template.
 #[derive(Debug, Clone, Default)]
 pub struct Template {

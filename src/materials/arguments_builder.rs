@@ -1,6 +1,9 @@
 use crate::{ArgumentValue, Arguments, Error, ToArgumentKey, WidthOrPrecisionAmount};
 use core::fmt::{Binary, Debug, Display, LowerExp, LowerHex, Octal, Pointer, UpperExp, UpperHex};
 
+#[cfg(not(feature = "std"))]
+use alloc::string::String;
+
 /// Checked builder of the [`Arguments`][$crate::Arguments].
 pub trait ArgumentsBuilder<'a> {
     fn format(self) -> Result<String, Error>;

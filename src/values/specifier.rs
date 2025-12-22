@@ -5,6 +5,9 @@ use crate::{
     values::{Alignment, Precision, Type, Width},
 };
 
+#[cfg(not(feature = "std"))]
+use alloc::string::ToString;
+
 /// Argument formatting specifier.
 /// ```rust
 /// use dfmt::*;

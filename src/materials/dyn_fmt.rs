@@ -1,5 +1,8 @@
 use crate::{ArgumentKey, ArgumentValue, Error, Template};
 
+#[cfg(not(feature = "std"))]
+use alloc::{string::String, vec::Vec};
+
 /// Format extension using a list of key-value-pairs.
 pub trait DynFmt {
     fn format(

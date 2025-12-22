@@ -1,6 +1,12 @@
 use crate::{ArgumentKey, ArgumentValue, Error, Template, ToArgumentKey, values::*};
 use core::fmt::Write;
 
+#[cfg(not(feature = "std"))]
+use alloc::{
+    string::{String, ToString},
+    vec::Vec,
+};
+
 /// Main structure to enrich the template with values and format the template to the end result.
 pub struct Arguments<'ct> {
     pub template: &'ct Template,

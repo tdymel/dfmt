@@ -1,5 +1,8 @@
 use crate::values::Type;
 
+#[cfg(not(feature = "std"))]
+use alloc::string::{String, ToString};
+
 #[doc(hidden)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypedArgumentKey {

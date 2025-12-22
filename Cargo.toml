@@ -3,25 +3,17 @@ name = "dfmt"
 authors = ["Tom Dymel <tom@dymel.dev>"]
 version = "0.1.0"
 edition = "2024"
-keywords = [
-    "dynamic",
-    "format",
-    "fmt",
-    "string",
-    "arguments",
-]
+keywords = ["dynamic", "format", "fmt", "string", "arguments"]
 categories = ["value-formatting", "text-processing"]
 description = "A fully featured dynamic drop in replacement for the format! macro."
 readme = "README.md"
 repository = "https://github.com/tdymel/dfmt"
 documentation = "https://docs.rs/dfmt"
 license = "MIT OR Apache-2.0"
-exclude = [
-    ".github",
-]
+exclude = [".github"]
 
 [dependencies]
-thiserror = "2"
+thiserror = { version = "2", default-features = false }
 
 [dev-dependencies]
 criterion = "0"
@@ -32,3 +24,5 @@ harness = false
 
 [features]
 nightly_formatting_options = []
+std = []
+default = ["std"]

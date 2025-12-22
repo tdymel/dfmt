@@ -2,6 +2,9 @@ use core::fmt::Write;
 
 use crate::{ArgumentKey, Error, values::Specifier};
 
+#[cfg(not(feature = "std"))]
+use alloc::{vec::Vec, string::{String, ToString}};
+
 #[derive(Debug, Clone)]
 pub enum Piece {
     Literal(String),
