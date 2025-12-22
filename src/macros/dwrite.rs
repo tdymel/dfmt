@@ -1,3 +1,13 @@
+/// Dynamic drop in `write!` replacement.
+/// 
+/// ```rust
+/// use core::fmt::Write;
+/// 
+/// let mut output = String::new();
+/// dfmt::dwrite!(&mut output, "Hello, {}!", "World").unwrap();
+/// dfmt::dwrite!(&mut output, "Hello, {}!".to_string(), "World").unwrap();
+/// ```
+/// Refer to the [`dformat!()`][$crate::dformat] documentation for the full API overview.
 #[macro_export]
 macro_rules! dwrite {
     ($output:expr, $template:literal, $($args:tt)*) => {{
@@ -6,12 +16,21 @@ macro_rules! dwrite {
     }};
     ($output:expr, $template:expr, $($args:tt)*) => {
         (|| -> Result<(), $crate::Error> {
-            write!($output, "{}", dformat!($template, $($args)*)?)
+            write!($output, "{}", $crate::dformat!($template, $($args)*)?)
                 .map_err(|err| $crate::Error::Fmt(err))
         })()
     };
 }
 
+/// Dynamic drop in `writeln!` replacement.
+/// ```rust
+/// use core::fmt::Write;
+/// 
+/// let mut output = String::new();
+/// dfmt::dwriteln!(&mut output, "Hello, {}!", "World").unwrap();
+/// dfmt::dwriteln!(&mut output, "Hello, {}!".to_string(), "World").unwrap();
+/// ```
+/// Refer to the [`dformat!()`][$crate::dformat] documentation for the full API overview.
 #[macro_export]
 macro_rules! dwriteln {
     ($output:expr, $template:literal, $($args:tt)*) => {{
@@ -20,7 +39,7 @@ macro_rules! dwriteln {
     }};
     ($output:expr, $template:expr, $($args:tt)*) => {
         (|| -> Result<(), $crate::Error> {
-            writeln!($output, "{}", dformat!($template, $($args)*)?)
+            writeln!($output, "{}", $crate::dformat!($template, $($args)*)?)
                 .map_err(|err| $crate::Error::Fmt(err))
         })()
     };

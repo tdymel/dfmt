@@ -12,6 +12,7 @@ impl TypedArgumentKey {
     }
 }
 
+/// The key of an argument.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ArgumentKey {
     Index(usize),

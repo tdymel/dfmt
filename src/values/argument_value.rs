@@ -2,6 +2,7 @@ use core::fmt::{Binary, Debug, Display, LowerExp, LowerHex, Octal, Pointer, Uppe
 
 use crate::values::Type;
 
+/// Possible variants of an argument.
 pub enum ArgumentValue<'ct> {
     Display(&'ct dyn Display),
     Debug(&'ct dyn Debug),

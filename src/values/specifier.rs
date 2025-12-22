@@ -5,19 +5,34 @@ use crate::{
     values::{Alignment, Precision, Type, Width},
 };
 
+/// Argument formatting specifier.
+/// ```rust
+/// use dfmt::*;
+/// 
+/// Specifier::default()
+///     .ty(Type::Debug)
+///     .alternate_form(true)
+///     .sign(false)
+///     .pad_zero(false)
+///     .fill_character('*')
+///     .alignment(Alignment::Center)
+///     .width(Width::Fixed(20))
+///     .precision(Precision::Auto);
+/// ```
 #[derive(Debug, Clone)]
 pub struct Specifier {
-    pub ty: Type,
-    pub alternate_form: bool,
-    pub fill_character: char,
-    pub alignment: Alignment,
-    pub sign: bool,
-    pub pad_zero: bool,
-    pub width: Width,
-    pub precision: Precision,
+    pub(crate) ty: Type,
+    pub(crate) alternate_form: bool,
+    pub(crate) fill_character: char,
+    pub(crate) alignment: Alignment,
+    pub(crate) sign: bool,
+    pub(crate) pad_zero: bool,
+    pub(crate) width: Width,
+    pub(crate) precision: Precision,
 }
 
 impl Specifier {
+    /// Attempt to parse a specifier.
     pub fn parse(input: &str, internal_index: &mut usize) -> Result<Self, Error> {
         // Parsing the specifier first, because if it contains a precision .*
         // then the index of the precision argument is before the omitted argument index
@@ -176,7 +191,7 @@ impl Specifier {
     }
 
     #[cfg(feature = "nightly_formatting_options")]
-    pub fn formatting_options(&self) -> core::fmt::FormattingOptions {
+    pub(crate) fn formatting_options(&self) -> core::fmt::FormattingOptions {
         let mut options = core::fmt::FormattingOptions::new();
         options
             .fill(self.fill_character)
@@ -202,6 +217,54 @@ impl Specifier {
             });
 
         options
+    }
+
+    /// Builder to specify the type.
+    pub fn ty(mut self, ty: Type) -> Self {
+        self.ty = ty;
+        self
+    }
+
+    /// Builder to set the alternate form.
+    pub fn alternate_form(mut self, alternate_form: bool) -> Self {
+        self.alternate_form = alternate_form;
+        self
+    }
+
+    /// Builder to specify the fill character
+    pub fn fill_character(mut self, fill_character: char) -> Self {
+        self.fill_character = fill_character;
+        self
+    }
+
+    /// Builder to specify the alignment.
+    pub fn alignment(mut self, alignment: Alignment) -> Self {
+        self.alignment = alignment;
+        self
+    }
+
+    /// Builder to set the sign mode.
+    pub fn sign(mut self, sign: bool) -> Self {
+        self.sign = sign;
+        self
+    }
+
+    /// Builder to set the pad zero mode.
+    pub fn pad_zero(mut self, pad_zero: bool) -> Self {
+        self.pad_zero = pad_zero;
+        self
+    }
+
+    /// Builder to specify the width.
+    pub fn width(mut self, width: Width) -> Self {
+        self.width = width;
+        self
+    }
+
+    /// Builder to specify the precision.
+    pub fn precision(mut self, precision: Precision) -> Self {
+        self.precision = precision;
+        self
     }
 }
 

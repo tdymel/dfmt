@@ -4,6 +4,7 @@ use crate::{
     values::{Piece, Precision, Specifier, Type, Width},
 };
 
+/// Precompiled version of the string template.
 #[derive(Debug, Clone)]
 pub struct Template {
     pub(crate) pieces: Vec<Piece>,
@@ -11,6 +12,28 @@ pub struct Template {
 }
 
 impl Template {
+    /// Create an empty template, which can be filled using the builders.
+    /// ```rust
+    /// use dfmt::*;
+    /// let formatted_string = Template::new()
+    ///     .literal("Hello, ")
+    ///     .specified_argument(0, Specifier::default())
+    ///     .literal("!")
+    ///     .arguments()
+    ///     .builder()
+    ///     .display(0, &"World")
+    ///     .format()
+    ///     .unwrap();
+    /// println!("{}", formatted_string);
+    /// ```
+    pub fn new() -> Self {
+        Self {
+            pieces: Vec::new(),
+            requirements: Vec::new(),
+        }
+    }
+
+    /// Parses a string template.
     pub fn parse(template: &str) -> Result<Self, Error> {
         let pieces = Piece::parse(template)?;
 
@@ -20,10 +43,18 @@ impl Template {
                 if let Some(specifier) = specifier {
                     Template::add_requirement(&mut requirements, key, specifier.ty);
                     if let Precision::Dynamic(precision_key) = &specifier.precision {
-                        Template::add_requirement(&mut requirements, precision_key, Type::WidthOrPrecisionAmount);
+                        Template::add_requirement(
+                            &mut requirements,
+                            precision_key,
+                            Type::WidthOrPrecisionAmount,
+                        );
                     }
                     if let Width::Dynamic(width_key) = &specifier.width {
-                        Template::add_requirement(&mut requirements, width_key, Type::WidthOrPrecisionAmount);
+                        Template::add_requirement(
+                            &mut requirements,
+                            width_key,
+                            Type::WidthOrPrecisionAmount,
+                        );
                     }
                 } else {
                     Template::add_requirement(&mut requirements, key, Type::Display);
@@ -38,6 +69,7 @@ impl Template {
         })
     }
 
+    /// Transition into [`Arguments`][$crate::Arguments] for convinience.
     pub fn arguments(&self) -> Arguments<'_> {
         Arguments::new(self)
     }
@@ -47,19 +79,29 @@ impl Template {
         self
     }
 
+    /// Builder to add a literal piece.
     pub fn literal<V: ToString>(mut self, literal: V) -> Self {
         self.pieces.push(Piece::Literal(literal.to_string()));
         self
     }
 
+    /// Builder to add an argument with a specifier.
     pub fn specified_argument<K: ToArgumentKey>(mut self, key: K, specifier: Specifier) -> Self {
         let argument_key = key.to_argument_key();
         Template::add_requirement(&mut self.requirements, &argument_key, specifier.ty);
         if let Precision::Dynamic(precision_key) = &specifier.precision {
-            Template::add_requirement(&mut self.requirements, precision_key, Type::WidthOrPrecisionAmount);
+            Template::add_requirement(
+                &mut self.requirements,
+                precision_key,
+                Type::WidthOrPrecisionAmount,
+            );
         }
         if let Width::Dynamic(width_key) = &specifier.width {
-            Template::add_requirement(&mut self.requirements, width_key, Type::WidthOrPrecisionAmount);
+            Template::add_requirement(
+                &mut self.requirements,
+                width_key,
+                Type::WidthOrPrecisionAmount,
+            );
         }
         self.pieces.push(Piece::Argument {
             key: argument_key,
@@ -68,6 +110,7 @@ impl Template {
         self
     }
 
+    /// Builder to add an argument without a specifier.
     pub fn argument<K: ToArgumentKey>(mut self, key: K) -> Self {
         let argument_key = key.to_argument_key();
         Template::add_requirement(&mut self.requirements, &argument_key, Type::Display);

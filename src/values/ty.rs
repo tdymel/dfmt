@@ -1,5 +1,6 @@
 use core::fmt::Write;
 
+/// Type variants of the specifier.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Type {
     Binary,

@@ -56,6 +56,19 @@ let using_str_extension = "Hello, {0} {{{world}}} {} {day:y<width$}!"
     ])
     .unwrap();
 println!("{}", using_str_extension);
+
+let using_manual_template_builder = Template::new()
+    .literal("Hello, ")
+    .specified_argument(0, Specifier::default()
+        .alignment(Alignment::Center)
+        .width(Width::Fixed(20)))
+    .literal("!")
+    .arguments()
+    .builder()
+    .display(0, &"World")
+    .format()
+    .unwrap();
+println!("{}", using_manual_template_builder);
 ```
 
 ## Features
@@ -65,6 +78,18 @@ println!("{}", using_str_extension);
 ✅ **With safety in mind**  
 ✅ **Blazingly fast**  
 🚧 **WIP: No-std support**
+
+### Formatting features
+| Name | Feature |
+| ---- | ------- |
+| Fill/Alignment | `<`, `^`, `>` |
+| Sign | `+`, `-` |
+| Alternate | `#` |
+| Zero-padding | `0` |
+| Width | `{:0}`, `{:width$}` |
+| Precision | `{:.5}`, `{:.precision$}`, `{:*}` |
+| Type | `?`, `x`, `X`, `o`, `b`, `e`, `E`, `p` |
+| Argument keys | `{}`, `{0}`, `{arg}` |
 
 ## How it works
 * Uses the `core::fmt` machinery under the hood. Therefore, you can expect the same formatting behaviour.

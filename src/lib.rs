@@ -3,8 +3,6 @@
 
 /*
 TODO:
-- Write documentation with examples
-
 - Create CI/CD
 - Publish crate
 
@@ -21,5 +19,6 @@ pub use materials::{
     Arguments, ArgumentsBuilder, DynFmt, Template, ToTemplate, UncheckedArgumentsBuilder,
 };
 pub use values::{
-    ArgumentKey, ArgumentTypeRequirements, ArgumentValue, ToArgumentKey, WidthOrPrecisionAmount,
+    Alignment, ArgumentKey, ArgumentTypeRequirements, ArgumentValue, Precision, Specifier,
+    ToArgumentKey, Width, WidthOrPrecisionAmount, Type
 };

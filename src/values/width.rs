@@ -2,6 +2,7 @@ use core::fmt::Write;
 
 use crate::ArgumentKey;
 
+/// Width variants of the specifier.
 #[derive(Debug, Clone)]
 pub enum Width {
     Dynamic(ArgumentKey),

@@ -1,12 +1,14 @@
 use crate::{ArgumentKey, ArgumentValue, Error, Template, ToArgumentKey, values::*};
 use core::fmt::Write;
 
+/// Main structure to enrich the template with values and format the template to the end result.
 pub struct Arguments<'ct> {
     pub template: &'ct Template,
     pub(crate) argument_values: Vec<(ArgumentKey, ArgumentValue<'ct>)>,
 }
 
 impl<'ct> Arguments<'ct> {
+    /// Create a new container from a precompiled template.
     pub fn new(template: &'ct Template) -> Self {
         Self {
             template,
@@ -26,6 +28,7 @@ impl<'ct> Arguments<'ct> {
             .ok_or_else(|| Error::ArgumentForTypeNotFound(TypedArgumentKey::new(key.clone(), *ty)))
     }
 
+    /// Attempt to format the template with the provided values.
     pub fn format(&self) -> Result<String, Error> {
         let mut result = String::with_capacity(
             self.template
@@ -87,6 +90,7 @@ impl<'ct> Arguments<'ct> {
     }
 
     // Builder
+    /// Attempts to add an argument and checks for duplicate argument values.
     pub fn add_argument_value<K: ToArgumentKey>(
         &mut self,
         key: K,
@@ -109,6 +113,7 @@ impl<'ct> Arguments<'ct> {
         Ok(())
     }
 
+    /// Adds an argument but does not execute any checks.
     pub fn add_argument_value_unchecked<K: ToArgumentKey>(
         &mut self,
         key: K,
@@ -117,12 +122,9 @@ impl<'ct> Arguments<'ct> {
         self.argument_values.push((key.to_argument_key(), value));
     }
 
+    /// Transitions into the checked [`ArgumentsBuilder`][$crate::ArgumentsBuilder].
     pub fn builder(self) -> Result<Self, Error> {
         Ok(self)
-    }
-
-    pub fn builder_unchecked(self) -> Self {
-        self
     }
 }
 

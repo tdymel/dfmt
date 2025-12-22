@@ -1,6 +1,7 @@
 use crate::{ArgumentValue, Arguments, Error, ToArgumentKey, WidthOrPrecisionAmount};
 use core::fmt::{Binary, Debug, Display, LowerExp, LowerHex, Octal, Pointer, UpperExp, UpperHex};
 
+/// Checked builder of the [`Arguments`][$crate::Arguments].
 pub trait ArgumentsBuilder<'a> {
     fn format(self) -> Result<String, Error>;
     fn argument_value<K: ToArgumentKey>(self, key: K, value: ArgumentValue<'a>) -> Self;
@@ -135,6 +136,8 @@ impl<'a> ArgumentsBuilder<'a> for Result<Arguments<'a>, Error> {
         Ok(args)
     }
 }
+
+/// Unchecked builder of the [`Arguments`][$crate::Arguments].
 pub trait UncheckedArgumentsBuilder<'a> {
     fn argument_value_unchecked<K: ToArgumentKey>(self, key: K, value: ArgumentValue<'a>) -> Self;
     fn display_unchecked<T: Display, K: ToArgumentKey>(self, key: K, value: &'a T) -> Self;

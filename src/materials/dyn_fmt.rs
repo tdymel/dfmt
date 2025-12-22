@@ -1,5 +1,6 @@
 use crate::{ArgumentKey, ArgumentValue, Error, Template};
 
+/// Format extension using a list of key-value-pairs.
 pub trait DynFmt {
     fn format(
         &self,
