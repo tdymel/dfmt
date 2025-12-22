@@ -20,7 +20,7 @@
 /// | Sign | `+`, `-` |
 /// | Alternate | `#` |
 /// | Zero-padding | `0` |
-/// | Width | `{:0}`, `{:width$}` |
+/// | Width | `{:20}`, `{:width$}` |
 /// | Precision | `{:.5}`, `{:.precision$}`, `{:*}` |
 /// | Type | `?`, `x`, `X`, `o`, `b`, `e`, `E`, `p` |
 /// | Argument keys | `{}`, `{0}`, `{arg}` |
