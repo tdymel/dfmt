@@ -1,8 +1,8 @@
 /// Dynamic drop in `write!` replacement.
-/// 
+///
 /// ```rust
 /// use core::fmt::Write;
-/// 
+///
 /// let mut output = String::new();
 /// dfmt::dwrite!(&mut output, "Hello, {}!", "World").unwrap();
 /// dfmt::dwrite!(&mut output, "Hello, {}!".to_string(), "World").unwrap();
@@ -25,7 +25,7 @@ macro_rules! dwrite {
 /// Dynamic drop in `writeln!` replacement.
 /// ```rust
 /// use core::fmt::Write;
-/// 
+///
 /// let mut output = String::new();
 /// dfmt::dwriteln!(&mut output, "Hello, {}!", "World").unwrap();
 /// dfmt::dwriteln!(&mut output, "Hello, {}!".to_string(), "World").unwrap();

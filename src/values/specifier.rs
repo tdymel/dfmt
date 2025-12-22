@@ -8,7 +8,7 @@ use crate::{
 /// Argument formatting specifier.
 /// ```rust
 /// use dfmt::*;
-/// 
+///
 /// Specifier::default()
 ///     .ty(Type::Debug)
 ///     .alternate_form(true)

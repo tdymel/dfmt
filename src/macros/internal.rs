@@ -144,7 +144,7 @@ macro_rules! __internal__dfmt_process {
             WidthOrPrecisionAmount,
             $crate::WidthOrPrecisionAmount
         )?;
-        
+
         Ok(()) as Result<(), $crate::Error>
     }};
 }

@@ -1,18 +1,18 @@
 /// Dynamic drop in `format!` replacement.
 /// ```rust
 /// use dfmt::*;
-/// 
-/// let template = "This example template {contains:*^width$} multiple {{{0}}} 
+///
+/// let template = "This example template {contains:*^width$} multiple {{{0}}}
 ///     named and {} indexed args {0:+020o} {3:#?} {:.*}.";
 /// let precompiled_template = Template::parse(template).unwrap();
 ///
 /// dformat!(template, contains = "STH", 42, 3, 3.1423223, template, width=50).unwrap();
 /// dformat!(precompiled_template, contains = "STH", 42, 3, 3.1423223, template, width=50).unwrap();
-/// 
+///
 /// // Use `format!` under the hood
 /// dfmt::dformat!("Hello, {}!", "World").unwrap();
 /// ```
-/// 
+///
 /// ## Supported features
 /// | Name | Feature |
 /// | ---- | ------- |

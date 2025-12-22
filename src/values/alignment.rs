@@ -1,4 +1,3 @@
-
 use core::fmt::Write;
 
 /// Alignment variants of the specifier.

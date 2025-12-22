@@ -1,5 +1,5 @@
-mod internal;
+mod deprint;
 mod dformat;
 mod dprint;
-mod deprint;
 mod dwrite;
+mod internal;

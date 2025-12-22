@@ -10,7 +10,8 @@ pub struct TestStruct {
 fn format_perf(c: &mut Criterion) {
     let format_string_simple_1arg = "Some string {}.".to_string();
     let format_string_simple_7args = "Some string {} sth {}{} {} {}{}{}.".to_string();
-    let format_string_complex = "This is a {{{0:#x}}} {0:o} {3:?} {2:0w$} {1} {arg:.p$E} {:*^20}.".to_string();
+    let format_string_complex =
+        "This is a {{{0:#x}}} {0:o} {3:?} {2:0w$} {1} {arg:.p$E} {:*^20}.".to_string();
 
     let compiled_template_simple_1arg = Template::parse(&format_string_simple_1arg).unwrap();
     let compiled_template_simple_7args = Template::parse(&format_string_simple_7args).unwrap();

@@ -20,5 +20,5 @@ pub use materials::{
 };
 pub use values::{
     Alignment, ArgumentKey, ArgumentTypeRequirements, ArgumentValue, Precision, Specifier,
-    ToArgumentKey, Width, WidthOrPrecisionAmount, Type
+    ToArgumentKey, Type, Width, WidthOrPrecisionAmount,
 };
