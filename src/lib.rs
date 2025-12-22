@@ -8,8 +8,6 @@ TODO:
 - Publish crate
 
 - Find out where the dformat_unchecked overhead comes from
-
-- Add categories
 */
 
 mod error;
