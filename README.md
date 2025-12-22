@@ -1,6 +1,6 @@
 # dfmt - `d`ynamic `format!`
 
-`dfmt` provides `core::fmt`-like string formatting and is a **fully featured** dynamic drop in replacment for the macros: `format!`, `print!`, `println!`, `eprint!`, `eprintln!`, `write!`, `writeln!`.
+`dfmt` provides `core::fmt`-like formatting for **dynamic templates** and is a **fully featured** dynamic drop in replacment for the macros: `format!`, `print!`, `println!`, `eprint!`, `eprintln!`, `write!`, `writeln!`.
 
 ```rust
 // Check out the documentation for a complete overview.
@@ -72,6 +72,7 @@ println!("{}", using_manual_template_builder);
 ```
 
 ## Features
+✅ **Support dynamic templates**  
 ✅ **All formatting specifiers**  
 ✅ **Indexed and named arguments**  
 ✅ **Easy to use API and macros**  
@@ -92,6 +93,7 @@ println!("{}", using_manual_template_builder);
 | Argument keys | `{}`, `{0}`, `{arg}` |
 
 ## How it works
+* If the template is a literal, then the `format!` macro is used under the hood.
 * Uses the `core::fmt` machinery under the hood. Therefore, you can expect the same formatting behaviour.
 * It uses [black magic](https://lukaskalbertodt.github.io/2019/12/05/generalized-autoref-based-specialization.html) to provide a comfortable macro.
 
