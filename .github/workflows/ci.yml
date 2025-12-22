@@ -1,40 +1,25 @@
-name: CI/CD Pipeline
+name: Cargo Build & Test
 
 on:
   push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
+
+env: 
+  CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  build_and_test:
+    name: Rust project - latest
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - beta
+          - nightly
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set up Rust
-      uses: actions/setup-rust@v1
-      with:
-        rust-version: stable
-
-    - name: Install dependencies
-      run: |
-        rustup component add rustfmt
-        rustup component add clippy
-        rustup component add llvm-tools-preview
-
-    - name: Format check
-      run: cargo fmt -- --check
-
-    - name: Lint check
-      run: cargo clippy -- -D warnings
-
-    - name: Run tests
-      run: cargo test
-
-    - name: Build test
-      run: cargo build --release
+      - uses: actions/checkout@v4
+      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - run: cargo build --verbose
+      - run: cargo test --verbose
+  
