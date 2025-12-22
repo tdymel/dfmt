@@ -1,5 +1,6 @@
 use crate::values::Type;
 
+#[doc(hidden)]
 #[derive(Debug, Clone, Copy)]
 pub struct ArgumentTypeRequirements {
     pub display: bool,

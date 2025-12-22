@@ -1,3 +1,4 @@
+#[doc(hidden)]
 #[macro_export]
 macro_rules! __internal__dfmt {
     ($checked:literal, $template:expr, $($args:tt)*) => {
@@ -14,6 +15,7 @@ macro_rules! __internal__dfmt {
     };
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! __internal__dfmt_process_args {
     // Argument with ident key
@@ -36,6 +38,7 @@ macro_rules! __internal__dfmt_process_args {
     ($checked:literal, $arguments:expr, $index:expr) => {Ok(())};
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! __internal__dfmt_process {
     ($checked:literal, $arguments:expr, $key:expr, $value:expr) => {{
@@ -146,6 +149,7 @@ macro_rules! __internal__dfmt_process {
     }};
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! __internal__dfmt_black_magic {
     ($checked:literal, $requirements:expr, $req_variant:ident, $arguments:expr, $key:expr, $value:expr, $variant:ident, $ty:path) => {{

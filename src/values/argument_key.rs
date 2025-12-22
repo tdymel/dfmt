@@ -27,6 +27,7 @@ impl core::fmt::Display for ArgumentKey {
     }
 }
 
+#[doc(hidden)]
 pub trait ToArgumentKey {
     fn to_argument_key(&self) -> ArgumentKey;
 }

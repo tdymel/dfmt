@@ -6,8 +6,8 @@ use crate::{
 
 #[derive(Debug, Clone)]
 pub struct Template {
-    pub pieces: Vec<Piece>,
-    pub requirements: Vec<(ArgumentKey, ArgumentTypeRequirements)>,
+    pub(crate) pieces: Vec<Piece>,
+    pub(crate) requirements: Vec<(ArgumentKey, ArgumentTypeRequirements)>,
 }
 
 impl Template {
@@ -42,6 +42,7 @@ impl Template {
         Arguments::new(self)
     }
 
+    #[doc(hidden)]
     pub fn to_template(&self) -> &Template {
         self
     }
@@ -114,6 +115,7 @@ impl core::fmt::Display for Template {
     }
 }
 
+#[doc(hidden)]
 pub trait ToTemplate {
     fn to_template(self) -> Template;
 }

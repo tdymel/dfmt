@@ -3,7 +3,7 @@ use core::fmt::Write;
 
 pub struct Arguments<'ct> {
     pub template: &'ct Template,
-    pub argument_values: Vec<(ArgumentKey, ArgumentValue<'ct>)>,
+    pub(crate) argument_values: Vec<(ArgumentKey, ArgumentValue<'ct>)>,
 }
 
 impl<'ct> Arguments<'ct> {

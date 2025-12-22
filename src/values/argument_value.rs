@@ -58,6 +58,7 @@ impl<'ct> core::fmt::Display for ArgumentValue<'ct> {
     }
 }
 
+#[doc(hidden)]
 pub trait WidthOrPrecisionAmount {
     fn to_u16(&self) -> u16;
 }

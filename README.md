@@ -4,9 +4,10 @@
 
 ```rust
 // Check out the documentation for a complete overview.
+use dfmt::*;
 
 let str_template = "Hello, {0} {{{world}}} {} {day:y<width$}!";
-let precompiled_template = Template::from(str_template);
+let precompiled_template = Template::parse(str_template).unwrap();
 
 // Parsing the str template on the fly
 dprintln!(str_template, "what a nice", world = "world", day = "day", width=20);
@@ -15,19 +16,21 @@ dprintln!(str_template, "what a nice", world = "world", day = "day", width=20);
 dprintln!(precompiled_template, "what a nice", world = "world", day = "day", width=20);
 
 // Uses println! under the hood
-dprintln!("Hello, {0} {{{world}}} {} {day:y<width$}!", "what a nice", world = "world", day = "day", width=20);
+dprintln!("Hello, {0} {{{world}}} {} {day:y<width$}!", "what a nice", 
+    world = "world", day = "day", width=20);
 
 // Other APIs
-let using_dformat = dformat!(precompiled_template, "what a nice", world = "world", day = "day", width=20);
+let using_dformat = dformat!(precompiled_template, "what a nice", 
+    world = "world", day = "day", width=20).unwrap();
 println!("{}", using_dformat);
 
 let using_manual_builder_api = precompiled_template
     .arguments()
     .builder()
     .display(0, &"what a nice")
-    .display("world", "world")
-    .display("day", "day")
-    .width_or_precision_amount("width", 20)
+    .display("world", &"world")
+    .display("day", &"day")
+    .width_or_precision_amount("width", &20)
     .format()
     .unwrap();
 println!("{}", using_manual_builder_api);

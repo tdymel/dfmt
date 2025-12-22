@@ -1,4 +1,5 @@
 #![cfg_attr(feature = "nightly_formatting_options", feature(formatting_options))]
+#![doc = include_str!("../README.md")]
 
 /*
 TODO:
@@ -7,7 +8,7 @@ TODO:
 - Create CI/CD
 - Publish crate
 
-- Find out where the dformat_unchecked overhead comes from
+- Test error cases
 */
 
 mod error;
