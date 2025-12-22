@@ -268,7 +268,7 @@ impl Specifier {
     }
 }
 
-impl<'a> Default for Specifier {
+impl Default for Specifier {
     fn default() -> Self {
         Self {
             ty: Type::Display,

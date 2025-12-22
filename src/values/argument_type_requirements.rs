@@ -1,8 +1,7 @@
 use crate::values::Type;
 
 #[doc(hidden)]
-#[derive(Debug, Clone, Copy)]
-#[derive(Default)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct ArgumentTypeRequirements {
     pub display: bool,
     pub debug: bool,
@@ -15,7 +14,6 @@ pub struct ArgumentTypeRequirements {
     pub octal: bool,
     pub width_or_precision_amount: bool,
 }
-
 
 impl ArgumentTypeRequirements {
     pub fn add_requirement(&mut self, ty: Type) {

@@ -5,7 +5,7 @@ use crate::{
 };
 
 /// Precompiled version of the string template.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Template {
     pub(crate) pieces: Vec<Piece>,
     pub(crate) requirements: Vec<(ArgumentKey, ArgumentTypeRequirements)>,
@@ -27,10 +27,7 @@ impl Template {
     /// println!("{}", formatted_string);
     /// ```
     pub fn new() -> Self {
-        Self {
-            pieces: Vec::new(),
-            requirements: Vec::new(),
-        }
+        Self::default()
     }
 
     /// Parses a string template.
@@ -38,25 +35,27 @@ impl Template {
         let pieces = Piece::parse(template)?;
 
         let mut requirements = Vec::with_capacity(pieces.len());
-        pieces.iter().for_each(|piece| if let Piece::Argument { key, specifier } = piece {
-            if let Some(specifier) = specifier {
-                Template::add_requirement(&mut requirements, key, specifier.ty);
-                if let Precision::Dynamic(precision_key) = &specifier.precision {
-                    Template::add_requirement(
-                        &mut requirements,
-                        precision_key,
-                        Type::WidthOrPrecisionAmount,
-                    );
+        pieces.iter().for_each(|piece| {
+            if let Piece::Argument { key, specifier } = piece {
+                if let Some(specifier) = specifier {
+                    Template::add_requirement(&mut requirements, key, specifier.ty);
+                    if let Precision::Dynamic(precision_key) = &specifier.precision {
+                        Template::add_requirement(
+                            &mut requirements,
+                            precision_key,
+                            Type::WidthOrPrecisionAmount,
+                        );
+                    }
+                    if let Width::Dynamic(width_key) = &specifier.width {
+                        Template::add_requirement(
+                            &mut requirements,
+                            width_key,
+                            Type::WidthOrPrecisionAmount,
+                        );
+                    }
+                } else {
+                    Template::add_requirement(&mut requirements, key, Type::Display);
                 }
-                if let Width::Dynamic(width_key) = &specifier.width {
-                    Template::add_requirement(
-                        &mut requirements,
-                        width_key,
-                        Type::WidthOrPrecisionAmount,
-                    );
-                }
-            } else {
-                Template::add_requirement(&mut requirements, key, Type::Display);
             }
         });
 
