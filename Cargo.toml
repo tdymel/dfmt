@@ -16,11 +16,10 @@ exclude = [".github"]
 thiserror = { version = "2", default-features = false }
 
 [dev-dependencies]
-criterion = "0.6.0"
 
 [[bench]]
 name = "performance"
-harness = false
+path = "benches/performance.rs"
 
 [features]
 nightly_formatting_options = []

@@ -16,6 +16,7 @@ jobs:
     strategy:
       matrix:
         toolchain:
+          # - 1.31
           - stable
           - beta
           - nightly
