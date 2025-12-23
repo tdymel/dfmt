@@ -28,7 +28,7 @@ jobs:
       - run: cargo doc --verbose
       - run: cargo clippy --verbose
   ensure_no_std:
-    name: Esnure no_std environment works
+    name: Ensure no_std
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -38,5 +38,5 @@ jobs:
           - nightly
     steps:
       - uses: actions/checkout@v4
-      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }} && rustup target add x86_64-unknown-none
       - run: cd ensure_no_std && cargo run
