@@ -34,6 +34,10 @@ impl Piece {
             let char = chars[current_char];
             match char {
                 b':' if bracket == Some(b'{') => {
+                    if separator.is_some() {
+                        return Err(Error::UnexpectedToken);
+                    }
+
                     separator = Some(current_char);
                 }
                 b'{' | b'}' => match (bracket, char) {

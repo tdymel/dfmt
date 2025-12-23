@@ -21,6 +21,27 @@ test_dformat!(
     Error::UnexpectedToken,
     1
 );
+test_dformat!(template_parsing_5, "Hello {::}", Error::UnexpectedToken, 1);
+test_dformat!(template_parsing_6, "Hello {:++}", Error::UnexpectedToken, 1);
+test_dformat!(template_parsing_7, "Hello {:##}", Error::UnexpectedToken, 1);
+test_dformat!(
+    template_parsing_8,
+    "Hello {:<<<}",
+    Error::UnexpectedToken,
+    1
+);
+test_dformat!(
+    template_parsing_9,
+    "Hello {:.10.*}",
+    Error::UnexpectedToken,
+    1
+);
+test_dformat!(
+    template_parsing_10,
+    "Hello {:??}",
+    Error::UnexpectedToken,
+    1
+);
 test_dformat!(
     unexpected_argument_value,
     "{arg}",
