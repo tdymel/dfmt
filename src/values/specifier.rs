@@ -44,153 +44,65 @@ impl Specifier {
         let chars = input.as_bytes();
 
         let input_len = input.len();
+        let mut specifier = Specifier::default();
+
         if input_len == 0 {
-            return Ok(Specifier::default());
+            return Ok(specifier);
         }
-        let remaining = |pos: usize| input_len - pos;
 
-        let fill_character = if remaining(current_specifier_index) > 1 {
-            match (
-                chars[current_specifier_index],
-                chars[current_specifier_index + 1],
-            ) {
-                (char, b'<') | (char, b'^') | (char, b'>') => {
-                    current_specifier_index += 1;
-                    char as char
-                }
-                _ => ' ',
-            }
-        } else {
-            ' '
-        };
-        let alignment = if remaining(current_specifier_index) > 0 {
-            match chars[current_specifier_index] {
-                b'<' => {
-                    current_specifier_index += 1;
-                    Alignment::Left
-                }
-                b'>' => {
-                    current_specifier_index += 1;
-                    Alignment::Right
-                }
-                b'^' => {
-                    current_specifier_index += 1;
-                    Alignment::Center
-                }
-                _ => Alignment::Auto,
-            }
-        } else {
-            Alignment::Auto
-        };
-        let sign = remaining(current_specifier_index) > 0
-            && match chars[current_specifier_index] {
-                b'+' => {
-                    current_specifier_index += 1;
-                    true
-                }
-                _ => false,
-            };
-        let alternate_form = remaining(current_specifier_index) > 0
-            && match chars[current_specifier_index] {
-                b'#' => {
-                    current_specifier_index += 1;
-                    true
-                }
-                _ => false,
-            };
-        let pad_zero = remaining(current_specifier_index) > 0
-            && match chars[current_specifier_index] {
-                b'0' => {
-                    current_specifier_index += 1;
-                    true
-                }
-                _ => false,
-            };
-        let width = if remaining(current_specifier_index) > 0
-            && chars[current_specifier_index] != b'.'
-        {
-            if (chars[current_specifier_index] as char).is_ascii_digit() {
-                let mut until_index = current_specifier_index;
-                while remaining(until_index + 1) > 0
-                    && (chars[until_index + 1] as char).is_ascii_digit()
-                {
-                    until_index += 1;
-                }
-                until_index += 1;
-                let amount_str = &input[current_specifier_index..until_index];
-                current_specifier_index = until_index;
-                Width::Fixed(amount_str.parse::<u16>().unwrap())
-            } else if let Some(var_index) = input[current_specifier_index..].find('$') {
-                let end_index = current_specifier_index + var_index;
-
-                let key = ArgumentKey::Name(input[current_specifier_index..end_index].to_string());
-                current_specifier_index = end_index + 1;
-                Width::Dynamic(key)
-            } else {
-                Width::Fixed(0)
-            }
-        } else {
-            Width::Fixed(0)
-        };
-
-        let precision = if remaining(current_specifier_index) > 0
-            && chars[current_specifier_index] == b'.'
-        {
+        if let Some(fill_character) = parse_fill_character(&chars[current_specifier_index..]) {
             current_specifier_index += 1;
-            if (chars[current_specifier_index] as char).is_ascii_digit() {
-                let mut until_index = current_specifier_index;
-                while remaining(until_index + 1) > 0
-                    && (chars[until_index + 1] as char).is_ascii_digit()
-                {
-                    until_index += 1;
-                }
-                until_index += 1;
-                let amount_str = &input[current_specifier_index..until_index];
-                current_specifier_index = until_index;
-                Precision::Fixed(amount_str.parse::<u16>().unwrap())
-            } else if let Some(var_index) = input[current_specifier_index..].find('$') {
-                let end_index = current_specifier_index + var_index;
+            specifier.fill_character = fill_character;
+        }
 
-                let key = ArgumentKey::Name(input[current_specifier_index..end_index].to_string());
-                current_specifier_index = end_index + 1;
-                Precision::Dynamic(key)
-            } else if chars[current_specifier_index] == b'*' {
-                *internal_index += 1;
-                current_specifier_index += 1;
-                Precision::Dynamic(ArgumentKey::Index(*internal_index - 1))
-            } else {
-                Precision::Auto
-            }
+        // Check if len > 0 ?
+        if let Some(alignment) = parse_alignment(&chars[current_specifier_index..]) {
+            current_specifier_index += 1;
+            specifier.alignment = alignment;
+        }
+
+        if let Some(sign) = parse_sign(&chars[current_specifier_index..]) {
+            current_specifier_index += 1;
+            specifier.sign = sign;
+        }
+
+        if let Some(alternate_form) = parse_alternate_form(&chars[current_specifier_index..]) {
+            current_specifier_index += 1;
+            specifier.alternate_form = alternate_form;
+        }
+
+        if let Some(pad_zero) = parse_pad_zero(&chars[current_specifier_index..]) {
+            current_specifier_index += 1;
+            specifier.pad_zero = pad_zero;
+        }
+
+        if let Some((width, incr_index)) = parse_width(
+            &chars[current_specifier_index..],
+            &input[current_specifier_index..],
+        ) {
+            current_specifier_index += incr_index;
+            specifier.width = width;
+        }
+
+        if let Some((precision, incr_index)) = parse_precision(
+            &chars[current_specifier_index..],
+            &input[current_specifier_index..],
+            internal_index,
+        ) {
+            current_specifier_index += incr_index;
+            specifier.precision = precision;
+        }
+
+        if let Some(ty) = parse_ty(&chars[current_specifier_index..]) {
+            current_specifier_index += 1;
+            specifier.ty = ty;
+        }
+
+        if current_specifier_index < input.len() {
+            Err(Error::UnexpectedToken)
         } else {
-            Precision::Auto
-        };
-
-        let ty = if remaining(current_specifier_index) > 0 {
-            match chars[current_specifier_index] {
-                b'?' => Type::Debug,
-                b'b' => Type::Binary,
-                b'o' => Type::Octal,
-                b'e' => Type::LowerExp,
-                b'E' => Type::UpperExp,
-                b'x' => Type::LowerHex,
-                b'X' => Type::UpperHex,
-                b'p' => Type::Pointer,
-                _ => Type::Display,
-            }
-        } else {
-            Type::Display
-        };
-
-        Ok(Specifier {
-            ty,
-            alternate_form,
-            fill_character,
-            alignment,
-            sign,
-            pad_zero,
-            width,
-            precision,
-        })
+            Ok(specifier)
+        }
     }
 
     #[cfg(feature = "nightly_formatting_options")]
@@ -304,5 +216,130 @@ impl core::fmt::Display for Specifier {
         write!(f, "{}", self.ty)?;
 
         Ok(())
+    }
+}
+
+fn parse_fill_character(chars: &[u8]) -> Option<char> {
+    match (chars.first(), chars.get(1)) {
+        (Some(chr), Some(b'<') | Some(b'^') | Some(b'>')) => Some(*chr as char),
+        _ => None,
+    }
+}
+
+fn parse_alignment(chars: &[u8]) -> Option<Alignment> {
+    match chars.first() {
+        Some(b'<') => Some(Alignment::Left),
+        Some(b'^') => Some(Alignment::Center),
+        Some(b'>') => Some(Alignment::Right),
+        _ => None,
+    }
+}
+
+fn parse_sign(chars: &[u8]) -> Option<bool> {
+    match chars.first() {
+        Some(b'+') => Some(true),
+        Some(b'-') => Some(false),
+        _ => None,
+    }
+}
+
+fn parse_alternate_form(chars: &[u8]) -> Option<bool> {
+    match chars.first() {
+        Some(b'#') => Some(true),
+        _ => None,
+    }
+}
+
+fn parse_pad_zero(chars: &[u8]) -> Option<bool> {
+    match chars.first() {
+        Some(b'0') => Some(true),
+        _ => None,
+    }
+}
+
+fn parse_width(chars: &[u8], input: &str) -> Option<(Width, usize)> {
+    match chars.first() {
+        Some(b'.') => None,
+        Some(&chr) => {
+            if (chr as char).is_ascii_digit() {
+                let mut until_index = 0;
+                while let Some(&add_char) = chars.get(until_index + 1) {
+                    if !add_char.is_ascii_digit() {
+                        break;
+                    }
+                    until_index += 1;
+                }
+                until_index += 1;
+                Some((
+                    Width::Fixed(input[..until_index].parse::<u16>().unwrap()),
+                    until_index,
+                ))
+            } else {
+                input.find('$').map(|var_index| {
+                    (
+                        Width::Dynamic(ArgumentKey::Name(input[..var_index].to_string())),
+                        var_index + 1,
+                    )
+                })
+            }
+        }
+        None => None,
+    }
+}
+
+fn parse_precision(
+    chars: &[u8],
+    input: &str,
+    internal_index: &mut usize,
+) -> Option<(Precision, usize)> {
+    match chars.first() {
+        Some(b'.') => match chars.get(1) {
+            Some(b'*') => {
+                *internal_index += 1;
+                Some((
+                    Precision::Dynamic(ArgumentKey::Index(*internal_index - 1)),
+                    2,
+                ))
+            }
+            Some(&chr) => {
+                if (chr as char).is_ascii_digit() {
+                    let mut until_index = 1;
+                    while let Some(&add_char) = chars.get(until_index + 1) {
+                        if !add_char.is_ascii_digit() {
+                            break;
+                        }
+                        until_index += 1;
+                    }
+                    until_index += 1;
+                    Some((
+                        Precision::Fixed(input[1..until_index].parse::<u16>().unwrap()),
+                        until_index,
+                    ))
+                } else {
+                    input.find('$').map(|var_index| {
+                        (
+                            Precision::Dynamic(ArgumentKey::Name(input[1..var_index].to_string())),
+                            var_index + 1,
+                        )
+                    })
+                }
+            }
+            None => None,
+        },
+        _ => None,
+    }
+}
+
+fn parse_ty(chars: &[u8]) -> Option<Type> {
+    match chars.first() {
+        Some(b'?') => Some(Type::Debug),
+        Some(b'b') => Some(Type::Binary),
+        Some(b'o') => Some(Type::Octal),
+        Some(b'e') => Some(Type::LowerExp),
+        Some(b'E') => Some(Type::UpperExp),
+        Some(b'x') => Some(Type::LowerHex),
+        Some(b'X') => Some(Type::UpperHex),
+        Some(b'p') => Some(Type::Pointer),
+        _ => None,
     }
 }
