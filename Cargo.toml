@@ -15,7 +15,7 @@ readme = "README.md"
 repository = "https://github.com/tdymel/dfmt"
 documentation = "https://docs.rs/dfmt"
 license = "MIT OR Apache-2.0"
-exclude = [".github"]
+exclude = [".github", "ensure_no_std"]
 
 [dependencies]
 
