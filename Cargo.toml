@@ -16,6 +16,7 @@ repository = "https://github.com/tdymel/dfmt"
 documentation = "https://docs.rs/dfmt"
 license = "MIT OR Apache-2.0"
 exclude = [".github", "ensure_no_std"]
+rust-version = "1.81"
 
 [dependencies]
 
