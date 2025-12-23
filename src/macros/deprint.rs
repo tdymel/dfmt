@@ -4,6 +4,7 @@
 /// dfmt::deprint!("Hello, {}!".to_string(), "World").unwrap();
 /// ```
 /// Refer to the [`dformat!()`][$crate::dformat] documentation for the full API overview.
+#[cfg(feature = "std")]
 #[macro_export]
 macro_rules! deprint {
     ($template:literal, $($args:tt)*) => {{
@@ -24,6 +25,7 @@ macro_rules! deprint {
 /// dfmt::deprint_unchecked!("Hello, {}!".to_string(), "World");
 /// ```
 /// Refer to the [`dformat!()`][$crate::dformat] documentation for the full API overview.
+#[cfg(feature = "std")]
 #[macro_export]
 macro_rules! deprint_unchecked {
     ($template:literal, $($args:tt)*) => {{
@@ -40,6 +42,7 @@ macro_rules! deprint_unchecked {
 /// dfmt::deprintln!("Hello, {}!".to_string(), "World").unwrap();
 /// ```
 /// Refer to the [`dformat!()`][$crate::dformat] documentation for the full API overview.
+#[cfg(feature = "std")]
 #[macro_export]
 macro_rules! deprintln {
     ($template:literal, $($args:tt)*) => {{
@@ -60,6 +63,7 @@ macro_rules! deprintln {
 /// dfmt::deprintln_unchecked!("Hello, {}!".to_string(), "World");
 /// ```
 /// Refer to the [`dformat!()`][$crate::dformat] documentation for the full API overview.
+#[cfg(feature = "std")]
 #[macro_export]
 macro_rules! deprintln_unchecked {
     ($template:literal, $($args:tt)*) => {{

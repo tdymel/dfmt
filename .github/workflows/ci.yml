@@ -10,15 +10,14 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build_and_test:
+  main:
     name: Rust project - latest
     runs-on: ubuntu-latest
     strategy:
       matrix:
         toolchain:
-          # - 1.31
+          - 1.81
           - stable
-          - beta
           - nightly
     steps:
       - uses: actions/checkout@v4
@@ -28,5 +27,15 @@ jobs:
       - run: cargo test --verbose
       - run: cargo doc --verbose
       - run: cargo clippy --verbose
-
-  
+  ensure_no_std:
+    strategy:
+      runs-on: ubuntu-latest
+      matrix:
+        toolchain:
+          - 1.81
+          - stable
+          - nightly
+    steps:
+      - uses: actions/checkout@v4
+      - run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+      - run: cd ensure_no_std && cargo run

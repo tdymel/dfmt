@@ -24,10 +24,25 @@
 /// | Precision | `{:.5}`, `{:.precision$}`, `{:*}` |
 /// | Type | `?`, `x`, `X`, `o`, `b`, `e`, `E`, `p` |
 /// | Argument keys | `{}`, `{0}`, `{arg}` |
+#[cfg(feature = "std")]
 #[macro_export]
 macro_rules! dformat {
     ($template:literal, $($args:tt)*) => {{
+        #[cfg(not(feature = "std"))]
+        use alloc::format;
+
         Ok(format!($template, $($args)*)) as Result<String, $crate::Error>
+    }};
+    ($template:expr, $($args:tt)*) => {
+        $crate::__internal__dfmt!(true, $template, $($args)*)
+    };
+}
+
+#[cfg(not(feature = "std"))]
+#[macro_export]
+macro_rules! dformat {
+    ($template:literal, $($args:tt)*) => {{
+        Ok(alloc::format!($template, $($args)*)) as Result<String, $crate::Error>
     }};
     ($template:expr, $($args:tt)*) => {
         $crate::__internal__dfmt!(true, $template, $($args)*)
@@ -40,10 +55,22 @@ macro_rules! dformat {
 /// dfmt::dformat_unchecked!("Hello, {}!".to_string(), "World");
 /// ```
 /// Refer to the [`dformat!()`][$crate::dformat] documentation for the full API overview.
+#[cfg(feature = "std")]
 #[macro_export]
 macro_rules! dformat_unchecked {
     ($template:literal, $($args:tt)*) => {{
         format!($template, $($args)*)
+    }};
+    ($template:expr, $($args:tt)*) => {
+        $crate::__internal__dfmt!(false, $template, $($args)*).unwrap()
+    };
+}
+
+#[cfg(not(feature = "std"))]
+#[macro_export]
+macro_rules! dformat_unchecked {
+    ($template:literal, $($args:tt)*) => {{
+        alloc::format!($template, $($args)*)
     }};
     ($template:expr, $($args:tt)*) => {
         $crate::__internal__dfmt!(false, $template, $($args)*).unwrap()

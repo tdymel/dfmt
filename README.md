@@ -78,7 +78,7 @@ println!("{}", using_manual_template_builder);
 ✅ **Easy to use API and macros**  
 ✅ **With safety in mind**  
 ✅ **Blazingly fast**  
-🚧 **WIP: No-std support**
+✅ **No-std support (Using a global allocator, and only dformat! and write!)**
 
 ### Formatting features
 | Name | Feature |
