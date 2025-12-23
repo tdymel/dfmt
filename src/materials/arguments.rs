@@ -580,8 +580,10 @@ fn write_argument_value(
             }
         };
 
-        if specifier.alignment != Alignment::Auto && output.contains('ꙮ') {
-            *output = output.replace('ꙮ', &specifier.fill_character.to_string());
+        if let Some(width) = width {
+            if specifier.alignment != Alignment::Auto && width > 0 && output.contains('ꙮ') {
+                *output = output.replace('ꙮ', &specifier.fill_character.to_string());
+            }
         }
 
         result
