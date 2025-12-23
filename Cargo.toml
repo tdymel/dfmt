@@ -4,7 +4,12 @@ authors = ["Tom Dymel <tom@dymel.dev>"]
 version = "0.2.0"
 edition = "2021"
 keywords = ["dynamic", "format", "template", "string", "arguments"]
-categories = ["value-formatting", "text-processing"]
+categories = [
+    "value-formatting",
+    "text-processing",
+    "no-std",
+    "template-engine",
+]
 description = "A fully featured dynamic template drop in replacement for the format! macro."
 readme = "README.md"
 repository = "https://github.com/tdymel/dfmt"
