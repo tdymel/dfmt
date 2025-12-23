@@ -33,6 +33,10 @@ rust-version = "1.81"
 name = "performance"
 path = "benches/performance.rs"
 
+[[bench]]
+name = "dformat"
+path = "benches/dformat.rs"
+
 [features]
 nightly_formatting_options = []
 std = []

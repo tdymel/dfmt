@@ -117,6 +117,7 @@ However, I believe with further optimization this gap could be closed. In fact, 
 * When creating the `Arguments` structure, a vector is allocated for the arguments. This is barely noticeable for many arguments.
 * Right now padding a string with a fill character will cost some overhead.
 * If a pattern reuses an argument multiple times, it will push a typed version of this value multiple times right now. This allocates more memory, but is required to provide a convinient API.
+* The macros for convinience, incour some overhead due to auto-deref specialization. Its about 5-10 ns per value.
 
 ### Nightly
 If you are on nightly, you can opt in to the `nightly_formatting_options` feature to further improve the performance, 

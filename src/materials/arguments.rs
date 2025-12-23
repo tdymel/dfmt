@@ -22,6 +22,11 @@ impl<'ct> Arguments<'ct> {
         }
     }
 
+    /// Clear the argument values again
+    pub fn clear(&mut self) {
+        self.argument_values.clear();
+    }
+
     fn find_argument_value(
         &self,
         key: &ArgumentKey,
