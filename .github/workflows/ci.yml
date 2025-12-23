@@ -11,7 +11,7 @@ env:
 
 jobs:
   main:
-    name: Rust project - latest
+    name: Main
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -28,8 +28,9 @@ jobs:
       - run: cargo doc --verbose
       - run: cargo clippy --verbose
   ensure_no_std:
+    name: Esnure no_std environment works
+    runs-on: ubuntu-latest
     strategy:
-      runs-on: ubuntu-latest
       matrix:
         toolchain:
           - 1.81
