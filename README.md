@@ -129,7 +129,7 @@ These benchmarks compare `dfmt` with `format!` with dynamic arguments only. Obvi
 
 | Benchmark | simple - 1 arg | simple - 7 args | complex |
 | --------- | -------------- | --------------- | ------- |
-| Template::parse | 69 ns | 292 ns | 693 ns |
+| Template::parse | 67 ns | 249 ns | 684 ns |
 | **format!** | **30 ns** | 174 ns | **515 ns** |
 | Template unchecked | 46 ns | **173 ns** | 845 ns |
 | Template checked | 49 ns | 250 ns | 911 ns |
@@ -139,7 +139,7 @@ These benchmarks compare `dfmt` with `format!` with dynamic arguments only. Obvi
 #### With `formatting_options` feature
 | Benchmark | simple - 1 arg | simple - 7 args | complex |
 | --------- | -------------- | --------------- | ------- |
-| Template::parse | 69 ns | 292 ns | 693 ns |
+| Template::parse | 67 ns | 249 ns | 684 ns |
 | **format!** | **30 ns** | 174 ns | 515 ns |
 | Template unchecked | 46 ns | **169 ns** | **464 ns** |
 | Template checked | 49 ns | 238 ns | 527 ns |
