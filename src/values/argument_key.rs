@@ -26,8 +26,8 @@ pub enum ArgumentKey {
 impl core::fmt::Display for ArgumentKey {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            ArgumentKey::Index(index) => write!(f, "{index}"),
-            ArgumentKey::Name(name) => write!(f, "{name}"),
+            ArgumentKey::Index(index) => write!(f, "{}", index),
+            ArgumentKey::Name(name) => write!(f, "{}", name),
         }
     }
 }

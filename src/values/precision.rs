@@ -15,12 +15,12 @@ impl core::fmt::Display for Precision {
         match self {
             Precision::Dynamic(argument_key) => {
                 f.write_char('.')?;
-                write!(f, "{argument_key}")?;
+                write!(f, "{}", argument_key)?;
                 f.write_char('$')
             }
             Precision::Fixed(amount) => {
                 f.write_char('.')?;
-                write!(f, "{amount}")
+                write!(f, "{}", amount)
             }
             Precision::Auto => Ok(()),
         }

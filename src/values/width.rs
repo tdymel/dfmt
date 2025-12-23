@@ -13,10 +13,10 @@ impl core::fmt::Display for Width {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Width::Dynamic(argument_key) => {
-                write!(f, "{argument_key}")?;
+                write!(f, "{}", argument_key)?;
                 f.write_char('$')
             }
-            Width::Fixed(amount) => write!(f, "{amount}"),
+            Width::Fixed(amount) => write!(f, "{}", amount),
         }
     }
 }

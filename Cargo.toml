@@ -2,7 +2,7 @@
 name = "dfmt"
 authors = ["Tom Dymel <tom@dymel.dev>"]
 version = "0.1.0"
-edition = "2018"
+edition = "2021"
 keywords = ["dynamic", "format", "template", "string", "arguments"]
 categories = ["value-formatting", "text-processing"]
 description = "A fully featured dynamic template drop in replacement for the format! macro."

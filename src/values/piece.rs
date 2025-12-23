@@ -118,10 +118,10 @@ impl core::fmt::Display for Piece {
             Piece::BracketClose => f.write_str("}}"),
             Piece::Argument { key, specifier } => {
                 f.write_char('{')?;
-                write!(f, "{key}")?;
+                write!(f, "{}", key)?;
                 if let Some(specifier) = specifier {
                     f.write_char(':')?;
-                    write!(f, "{specifier}")?;
+                    write!(f, "{}", specifier)?;
                 }
                 f.write_char('}')
             }

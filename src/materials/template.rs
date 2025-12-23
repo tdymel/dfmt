@@ -151,7 +151,7 @@ impl Template {
 impl core::fmt::Display for Template {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         for piece in &self.pieces {
-            write!(f, "{piece}")?;
+            write!(f, "{}", piece)?;
         }
         Ok(())
     }
