@@ -146,5 +146,9 @@ These benchmarks compare `dfmt` with `format!` with dynamic arguments only. Obvi
 | dformat! unchecked | 51 ns | 232 ns | 576 ns |
 | dformat! checked | 51 ns | 257 ns | 658 ns |
 
+## Minimal rustc version
+Right now it compiles until 1.81, this is when `std::error` went into `core::Error`. 
+You can opt out of `error`-impl by disabling the feature `error`. Then you can go down until 1.56.
+
 ## License
 This project is dual licensed under the Apache 2.0 license and the MIT license.

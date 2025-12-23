@@ -23,4 +23,5 @@ path = "benches/performance.rs"
 [features]
 nightly_formatting_options = []
 std = []
-default = ["std"]
+default = ["std", "error"]
+error = []
