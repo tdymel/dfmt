@@ -10,7 +10,7 @@
 /// dformat!(precompiled_template, contains = "STH", 42, 3, 3.1423223, template, width=50).unwrap();
 ///
 /// // Use `format!` under the hood
-/// dfmt::dformat!("Hello, {}!", "World").unwrap();
+/// dformat!("Hello, {}!", "World").unwrap();
 /// ```
 ///
 /// ## Supported features
