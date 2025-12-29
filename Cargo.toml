@@ -1,7 +1,7 @@
 [package]
 name = "dfmt"
 authors = ["Tom Dymel <tom@dymel.dev>"]
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 keywords = ["dynamic", "format", "template", "string", "arguments"]
 categories = [

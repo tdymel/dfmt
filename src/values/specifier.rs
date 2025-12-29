@@ -24,14 +24,14 @@ use alloc::string::ToString;
 /// ```
 #[derive(Debug, Clone)]
 pub struct Specifier {
-    pub(crate) ty: Type,
-    pub(crate) alternate_form: bool,
-    pub(crate) fill_character: char,
-    pub(crate) alignment: Alignment,
-    pub(crate) sign: bool,
-    pub(crate) pad_zero: bool,
-    pub(crate) width: Width,
-    pub(crate) precision: Precision,
+    pub ty: Type,
+    pub alternate_form: bool,
+    pub fill_character: char,
+    pub alignment: Alignment,
+    pub sign: bool,
+    pub pad_zero: bool,
+    pub width: Width,
+    pub precision: Precision,
 }
 
 impl Specifier {
