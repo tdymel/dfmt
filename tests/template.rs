@@ -43,3 +43,12 @@ fn expect_argument_argument_not_within_constraints2() {
         )
     )
 }
+
+#[test]
+fn debug() {
+    let allowed_specifier = AllowedSpecifier::all().forbid(Type::Display);
+    assert!(Template::parse("Hello, {world}!")
+        .unwrap()
+        .expect_argument("world", &allowed_specifier)
+        .is_err());
+}

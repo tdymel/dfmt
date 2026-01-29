@@ -1,4 +1,4 @@
-use crate::{Alignment, Precision, Specifier, Type, Width};
+use crate::{values::Sign, Alignment, AlternateForm, PadZero, Precision, Specifier, Type, Width};
 
 #[cfg(not(feature = "std"))]
 use alloc::{
@@ -20,14 +20,13 @@ use alloc::{
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AllowedSpecifier {
-    // TODO: Refactor this to bitflags to consume less memory und remove box again
-    pub types: [bool; 10],
-    pub alternate_forms: [bool; 2],
+    pub types: u16,
+    pub alternate_forms: u8,
     pub allowed_fill_characters: Option<String>,
     pub forbidden_fill_characters: Option<String>,
-    pub alignments: [bool; 3],
-    pub signs: [bool; 2],
-    pub pad_zeros: [bool; 2],
+    pub alignments: u8,
+    pub signs: u8,
+    pub pad_zeros: u8,
     pub allowed_widths: Option<Vec<Width>>,
     pub forbidden_widths: Option<Vec<Width>>,
     pub allowed_precisions: Option<Vec<Precision>>,
@@ -37,13 +36,13 @@ pub struct AllowedSpecifier {
 impl AllowedSpecifier {
     pub fn all() -> Self {
         AllowedSpecifier {
-            types: [true; 10],
-            alternate_forms: [true; 2],
+            types: 0b11111111110000,
+            alternate_forms: 0b11000000,
             allowed_fill_characters: None,
             forbidden_fill_characters: None,
-            alignments: [true; 3],
-            signs: [true; 2],
-            pad_zeros: [true; 2],
+            alignments: 0b11100000,
+            signs: 0b11000000,
+            pad_zeros: 0b11000000,
             allowed_widths: None,
             forbidden_widths: None,
             allowed_precisions: None,
@@ -53,13 +52,13 @@ impl AllowedSpecifier {
 
     pub fn none() -> Self {
         AllowedSpecifier {
-            types: [false; 10],
-            alternate_forms: [false; 2],
+            types: 0,
+            alternate_forms: 0,
             allowed_fill_characters: Some(String::new()),
             forbidden_fill_characters: None,
-            alignments: [false; 3],
-            signs: [false; 2],
-            pad_zeros: [false; 2],
+            alignments: 0,
+            signs: 0,
+            pad_zeros: 0,
             allowed_widths: Some(Vec::new()),
             forbidden_widths: None,
             allowed_precisions: Some(Vec::new()),
@@ -68,8 +67,8 @@ impl AllowedSpecifier {
     }
 
     pub fn is_within_constraints(&self, specifier: &Specifier) -> bool {
-        self.types[specifier.ty as usize]
-            && self.alternate_forms[specifier.alternate_form.clone() as usize]
+        (self.types & (1 << (specifier.ty as usize))) != 0
+            && (self.alternate_forms & (1 << (specifier.alternate_form.clone() as usize))) != 0
             && self
                 .allowed_fill_characters
                 .as_ref()
@@ -80,9 +79,9 @@ impl AllowedSpecifier {
                 .as_ref()
                 .map(|fc| !fc.contains(specifier.fill_character))
                 .unwrap_or(true)
-            && self.alignments[specifier.alignment as usize]
-            && self.signs[specifier.sign.clone() as usize]
-            && self.pad_zeros[specifier.pad_zero.clone() as usize]
+            && (self.alignments & (1 << (specifier.alignment as usize))) != 0
+            && (self.signs & (1 << (specifier.sign.clone() as usize))) != 0
+            && (self.pad_zeros & (1 << (specifier.pad_zero.clone() as usize))) != 0
             && self
                 .allowed_widths
                 .as_ref()
@@ -113,24 +112,24 @@ pub trait AllowedSpecifierBuilder<T> {
 
 impl AllowedSpecifierBuilder<Type> for AllowedSpecifier {
     fn allow(mut self, constraint: Type) -> Self {
-        self.types[constraint as usize] = true;
+        self.types |= 1 << constraint as usize;
         self
     }
 
     fn forbid(mut self, constraint: Type) -> Self {
-        self.types[constraint as usize] = false;
+        self.types &= !(1 << constraint as usize);
         self
     }
 }
 
 impl AllowedSpecifierBuilder<Alignment> for AllowedSpecifier {
     fn allow(mut self, constraint: Alignment) -> Self {
-        self.alignments[constraint as usize] = true;
+        self.alignments |= 1 << constraint as usize;
         self
     }
 
     fn forbid(mut self, constraint: Alignment) -> Self {
-        self.alignments[constraint as usize] = true;
+        self.alignments &= !(1 << constraint as usize);
         self
     }
 }
@@ -241,6 +240,42 @@ impl AllowedSpecifierBuilder<Precision> for AllowedSpecifier {
             precisions.push(constraint);
         }
 
+        self
+    }
+}
+
+impl AllowedSpecifierBuilder<Sign> for AllowedSpecifier {
+    fn allow(mut self, constraint: Sign) -> Self {
+        self.signs |= 1 << constraint as usize;
+        self
+    }
+
+    fn forbid(mut self, constraint: Sign) -> Self {
+        self.signs &= !(1 << constraint as usize);
+        self
+    }
+}
+
+impl AllowedSpecifierBuilder<PadZero> for AllowedSpecifier {
+    fn allow(mut self, constraint: PadZero) -> Self {
+        self.pad_zeros |= 1 << constraint as usize;
+        self
+    }
+
+    fn forbid(mut self, constraint: PadZero) -> Self {
+        self.pad_zeros &= !(1 << constraint as usize);
+        self
+    }
+}
+
+impl AllowedSpecifierBuilder<AlternateForm> for AllowedSpecifier {
+    fn allow(mut self, constraint: AlternateForm) -> Self {
+        self.alternate_forms |= 1 << constraint as usize;
+        self
+    }
+
+    fn forbid(mut self, constraint: AlternateForm) -> Self {
+        self.alternate_forms &= !(1 << constraint as usize);
         self
     }
 }
