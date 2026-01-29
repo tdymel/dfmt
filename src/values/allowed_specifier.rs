@@ -1,10 +1,7 @@
 use crate::{values::Sign, Alignment, AlternateForm, PadZero, Precision, Specifier, Type, Width};
 
 #[cfg(not(feature = "std"))]
-use alloc::{
-    string::{String, ToString},
-    vec::Vec,
-};
+use alloc::{string::String, vec, vec::Vec};
 
 /// Helper structure to specify the constraints of an expected argument.
 /// ```rust
