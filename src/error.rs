@@ -1,9 +1,10 @@
-use crate::{values::TypedArgumentKey, ArgumentKey};
+use crate::{values::TypedArgumentKey, AllowedSpecifier, ArgumentKey, Specifier};
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Error {
     ArgumentForTypeNotFound(TypedArgumentKey),
     ArgumentNotFound(ArgumentKey),
+    ArgumentNotWithinConstraints(ArgumentKey, Specifier, Box<AllowedSpecifier>),
     DuplicateArgument(TypedArgumentKey),
     UnexpectedArgumentValue,
     Fmt(core::fmt::Error),
@@ -24,6 +25,11 @@ impl core::fmt::Display for Error {
             Error::ArgumentNotFound(argument_key) => {
                 write!(f, "Argument for key '{0:#?}' not found", argument_key)
             }
+            Error::ArgumentNotWithinConstraints(key, provided_specifer, allowed_specifier) => write!(
+                f,
+                "Argument specifier for key '{0:#?}' is not within the expected constraints. Provided: {1:#?}; Allowed: {2:#?}",
+                key, provided_specifer, allowed_specifier
+            ),
             Error::DuplicateArgument(typed_argument_key) => write!(
                 f,
                 "Duplicate argument value for key '{0:#?}'",

@@ -15,6 +15,7 @@ pub use materials::{
     Arguments, ArgumentsBuilder, DynFmt, Template, ToTemplate, UncheckedArgumentsBuilder,
 };
 pub use values::{
-    Alignment, ArgumentKey, ArgumentTypeRequirements, ArgumentValue, Precision, Specifier,
-    ToArgumentKey, Type, TypedArgumentKey, Width, WidthOrPrecisionAmount,
+    Alignment, AllowedSpecifier, AllowedSpecifierBuilder, ArgumentKey, ArgumentTypeRequirements,
+    ArgumentValue, Precision, Specifier, ToArgumentKey, Type, TypedArgumentKey, Width,
+    WidthOrPrecisionAmount,
 };

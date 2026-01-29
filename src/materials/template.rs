@@ -1,6 +1,6 @@
 use crate::{
     error::Error,
-    values::{Piece, Precision, Specifier, Type, Width},
+    values::{AllowedSpecifier, Piece, Precision, Specifier, Type, Width},
     ArgumentKey, ArgumentTypeRequirements, Arguments, ToArgumentKey,
 };
 
@@ -66,6 +66,36 @@ impl Template {
             pieces,
             requirements,
         })
+    }
+
+    /// Expect a specified argument within a parsed template
+    pub fn expect_argument<K: ToArgumentKey>(
+        &self,
+        key: K,
+        allowed_specifier: &AllowedSpecifier,
+    ) -> Result<&Self, Error> {
+        let argument_key = key.to_argument_key();
+        let argument = self
+            .pieces
+            .iter()
+            .find(|piece| match piece {
+                Piece::Argument { key, .. } => key == &argument_key,
+                _ => false,
+            })
+            .ok_or_else(|| Error::ArgumentNotFound(argument_key.clone()))?;
+
+        if let Piece::Argument { specifier, .. } = argument {
+            let specifier = specifier.clone().unwrap_or_else(Specifier::default);
+            if !allowed_specifier.is_within_constraints(&specifier) {
+                return Err(Error::ArgumentNotWithinConstraints(
+                    argument_key,
+                    specifier.clone(),
+                    Box::new(allowed_specifier.clone()),
+                ));
+            }
+        }
+
+        Ok(self)
     }
 
     /// Transition into [`Arguments`][$crate::Arguments] for convinience.

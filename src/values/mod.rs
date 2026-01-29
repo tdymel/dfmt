@@ -1,4 +1,5 @@
 mod alignment;
+mod allowed_specifier;
 mod argument_key;
 mod argument_type_requirements;
 mod argument_value;
@@ -9,6 +10,7 @@ mod ty;
 mod width;
 
 pub use alignment::Alignment;
+pub use allowed_specifier::{AllowedSpecifier, AllowedSpecifierBuilder};
 pub use argument_key::*;
 pub use argument_type_requirements::ArgumentTypeRequirements;
 pub use argument_value::*;

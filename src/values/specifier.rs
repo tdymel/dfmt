@@ -22,7 +22,7 @@ use alloc::string::ToString;
 ///     .width(Width::Fixed(20))
 ///     .precision(Precision::Auto);
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Specifier {
     pub ty: Type,
     pub alternate_form: bool,
