@@ -5,7 +5,7 @@ use crate::{
 };
 
 #[cfg(not(feature = "std"))]
-use alloc::{string::ToString, vec::Vec};
+use alloc::{boxed::Box, string::ToString, vec::Vec};
 
 /// Precompiled version of the string template.
 #[derive(Debug, Clone, Default)]

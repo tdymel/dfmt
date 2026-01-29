@@ -1,5 +1,8 @@
 use crate::{values::TypedArgumentKey, AllowedSpecifier, ArgumentKey, Specifier};
 
+#[cfg(not(feature = "std"))]
+use alloc::boxed::Box;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum Error {
     ArgumentForTypeNotFound(TypedArgumentKey),
