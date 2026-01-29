@@ -186,15 +186,21 @@ fn write_argument_value(
     if let Some(specifier) = specifier {
         let result = match (
             specifier.alignment,
-            specifier.sign,
-            specifier.alternate_form,
-            specifier.pad_zero,
+            &specifier.sign,
+            &specifier.alternate_form,
+            &specifier.pad_zero,
             &specifier.precision,
         ) {
-            (Alignment::Auto, true, true, true, Precision::Auto) => {
+            (
+                Alignment::Auto,
+                Sign::Plus,
+                AlternateForm::Activated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:+#0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Auto, true, true, true, _) => {
+            (Alignment::Auto, Sign::Plus, AlternateForm::Activated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:+#0w$.p$}",
@@ -203,10 +209,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Auto, true, true, false, Precision::Auto) => {
+            (
+                Alignment::Auto,
+                Sign::Plus,
+                AlternateForm::Activated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:+#w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Auto, true, true, false, _) => {
+            (Alignment::Auto, Sign::Plus, AlternateForm::Activated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:+#w$.p$}",
@@ -215,10 +227,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Auto, true, false, true, Precision::Auto) => {
+            (
+                Alignment::Auto,
+                Sign::Plus,
+                AlternateForm::Deactivated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:+0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Auto, true, false, true, _) => {
+            (Alignment::Auto, Sign::Plus, AlternateForm::Deactivated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:+0w$.p$}",
@@ -227,10 +245,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Auto, true, false, false, Precision::Auto) => {
+            (
+                Alignment::Auto,
+                Sign::Plus,
+                AlternateForm::Deactivated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:+#w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Auto, true, false, false, _) => {
+            (Alignment::Auto, Sign::Plus, AlternateForm::Deactivated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:+w$.p$}",
@@ -239,10 +263,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Auto, false, true, true, Precision::Auto) => {
+            (
+                Alignment::Auto,
+                Sign::None,
+                AlternateForm::Activated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:#0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Auto, false, true, true, _) => {
+            (Alignment::Auto, Sign::None, AlternateForm::Activated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:#0w$.p$}",
@@ -251,10 +281,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Auto, false, true, false, Precision::Auto) => {
+            (
+                Alignment::Auto,
+                Sign::None,
+                AlternateForm::Activated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:#w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Auto, false, true, false, _) => {
+            (Alignment::Auto, Sign::None, AlternateForm::Activated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:#w$.p$}",
@@ -263,10 +299,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Auto, false, false, true, Precision::Auto) => {
+            (
+                Alignment::Auto,
+                Sign::None,
+                AlternateForm::Deactivated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Auto, false, false, true, _) => {
+            (Alignment::Auto, Sign::None, AlternateForm::Deactivated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:0w$.p$}",
@@ -275,10 +317,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Auto, false, false, false, Precision::Auto) => {
+            (
+                Alignment::Auto,
+                Sign::None,
+                AlternateForm::Deactivated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Auto, false, false, false, _) => {
+            (Alignment::Auto, Sign::None, AlternateForm::Deactivated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:w$.p$}",
@@ -288,10 +336,16 @@ fn write_argument_value(
                 )
             }
 
-            (Alignment::Left, true, true, true, Precision::Auto) => {
+            (
+                Alignment::Left,
+                Sign::Plus,
+                AlternateForm::Activated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ<+#0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Left, true, true, true, _) => {
+            (Alignment::Left, Sign::Plus, AlternateForm::Activated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:ꙮ<+#0w$.p$}",
@@ -300,10 +354,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Left, true, true, false, Precision::Auto) => {
+            (
+                Alignment::Left,
+                Sign::Plus,
+                AlternateForm::Activated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ<+#w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Left, true, true, false, _) => {
+            (Alignment::Left, Sign::Plus, AlternateForm::Activated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:ꙮ<+#w$.p$}",
@@ -312,10 +372,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Left, true, false, true, Precision::Auto) => {
+            (
+                Alignment::Left,
+                Sign::Plus,
+                AlternateForm::Deactivated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ<+0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Left, true, false, true, _) => {
+            (Alignment::Left, Sign::Plus, AlternateForm::Deactivated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:ꙮ<+0w$.p$}",
@@ -324,10 +390,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Left, true, false, false, Precision::Auto) => {
+            (
+                Alignment::Left,
+                Sign::Plus,
+                AlternateForm::Deactivated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ<+#w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Left, true, false, false, _) => {
+            (Alignment::Left, Sign::Plus, AlternateForm::Deactivated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:ꙮ<+w$.p$}",
@@ -336,10 +408,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Left, false, true, true, Precision::Auto) => {
+            (
+                Alignment::Left,
+                Sign::None,
+                AlternateForm::Activated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ<#0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Left, false, true, true, _) => {
+            (Alignment::Left, Sign::None, AlternateForm::Activated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:ꙮ<#0w$.p$}",
@@ -348,10 +426,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Left, false, true, false, Precision::Auto) => {
+            (
+                Alignment::Left,
+                Sign::None,
+                AlternateForm::Activated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ<#w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Left, false, true, false, _) => {
+            (Alignment::Left, Sign::None, AlternateForm::Activated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:ꙮ<#w$.p$}",
@@ -360,10 +444,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Left, false, false, true, Precision::Auto) => {
+            (
+                Alignment::Left,
+                Sign::None,
+                AlternateForm::Deactivated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ<0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Left, false, false, true, _) => {
+            (Alignment::Left, Sign::None, AlternateForm::Deactivated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:ꙮ<0w$.p$}",
@@ -372,10 +462,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Left, false, false, false, Precision::Auto) => {
+            (
+                Alignment::Left,
+                Sign::None,
+                AlternateForm::Deactivated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ<w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Left, false, false, false, _) => {
+            (Alignment::Left, Sign::None, AlternateForm::Deactivated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:ꙮ<w$.p$}",
@@ -385,10 +481,16 @@ fn write_argument_value(
                 )
             }
 
-            (Alignment::Center, true, true, true, Precision::Auto) => {
+            (
+                Alignment::Center,
+                Sign::Plus,
+                AlternateForm::Activated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ^+#0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Center, true, true, true, _) => {
+            (Alignment::Center, Sign::Plus, AlternateForm::Activated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:ꙮ^+#0w$.p$}",
@@ -397,10 +499,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Center, true, true, false, Precision::Auto) => {
+            (
+                Alignment::Center,
+                Sign::Plus,
+                AlternateForm::Activated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ^+#w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Center, true, true, false, _) => {
+            (Alignment::Center, Sign::Plus, AlternateForm::Activated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:ꙮ^+#w$.p$}",
@@ -409,10 +517,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Center, true, false, true, Precision::Auto) => {
+            (
+                Alignment::Center,
+                Sign::Plus,
+                AlternateForm::Deactivated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ^+0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Center, true, false, true, _) => {
+            (Alignment::Center, Sign::Plus, AlternateForm::Deactivated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:ꙮ^+0w$.p$}",
@@ -421,10 +535,22 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Center, true, false, false, Precision::Auto) => {
+            (
+                Alignment::Center,
+                Sign::Plus,
+                AlternateForm::Deactivated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ^+#w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Center, true, false, false, _) => {
+            (
+                Alignment::Center,
+                Sign::Plus,
+                AlternateForm::Deactivated,
+                PadZero::Deactivated,
+                _,
+            ) => {
                 write!(
                     output,
                     "{:ꙮ^+w$.p$}",
@@ -433,10 +559,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Center, false, true, true, Precision::Auto) => {
+            (
+                Alignment::Center,
+                Sign::None,
+                AlternateForm::Activated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ^#0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Center, false, true, true, _) => {
+            (Alignment::Center, Sign::None, AlternateForm::Activated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:ꙮ^#0w$.p$}",
@@ -445,10 +577,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Center, false, true, false, Precision::Auto) => {
+            (
+                Alignment::Center,
+                Sign::None,
+                AlternateForm::Activated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ^#w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Center, false, true, false, _) => {
+            (Alignment::Center, Sign::None, AlternateForm::Activated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:ꙮ^#w$.p$}",
@@ -457,10 +595,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Center, false, false, true, Precision::Auto) => {
+            (
+                Alignment::Center,
+                Sign::None,
+                AlternateForm::Deactivated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ^0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Center, false, false, true, _) => {
+            (Alignment::Center, Sign::None, AlternateForm::Deactivated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:ꙮ^0w$.p$}",
@@ -469,10 +613,22 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Center, false, false, false, Precision::Auto) => {
+            (
+                Alignment::Center,
+                Sign::None,
+                AlternateForm::Deactivated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ^w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Center, false, false, false, _) => {
+            (
+                Alignment::Center,
+                Sign::None,
+                AlternateForm::Deactivated,
+                PadZero::Deactivated,
+                _,
+            ) => {
                 write!(
                     output,
                     "{:ꙮ^w$.p$}",
@@ -482,10 +638,16 @@ fn write_argument_value(
                 )
             }
 
-            (Alignment::Right, true, true, true, Precision::Auto) => {
+            (
+                Alignment::Right,
+                Sign::Plus,
+                AlternateForm::Activated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ>+#0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Right, true, true, true, _) => {
+            (Alignment::Right, Sign::Plus, AlternateForm::Activated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:ꙮ>+#0w$.p$}",
@@ -494,10 +656,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Right, true, true, false, Precision::Auto) => {
+            (
+                Alignment::Right,
+                Sign::Plus,
+                AlternateForm::Activated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ>+#w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Right, true, true, false, _) => {
+            (Alignment::Right, Sign::Plus, AlternateForm::Activated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:ꙮ>+#w$.p$}",
@@ -506,10 +674,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Right, true, false, true, Precision::Auto) => {
+            (
+                Alignment::Right,
+                Sign::Plus,
+                AlternateForm::Deactivated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ>+0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Right, true, false, true, _) => {
+            (Alignment::Right, Sign::Plus, AlternateForm::Deactivated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:ꙮ>+0w$.p$}",
@@ -518,10 +692,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Right, true, false, false, Precision::Auto) => {
+            (
+                Alignment::Right,
+                Sign::Plus,
+                AlternateForm::Deactivated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ>+#w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Right, true, false, false, _) => {
+            (Alignment::Right, Sign::Plus, AlternateForm::Deactivated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:ꙮ>+w$.p$}",
@@ -530,10 +710,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Right, false, true, true, Precision::Auto) => {
+            (
+                Alignment::Right,
+                Sign::None,
+                AlternateForm::Activated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ>#0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Right, false, true, true, _) => {
+            (Alignment::Right, Sign::None, AlternateForm::Activated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:ꙮ>#0w$.p$}",
@@ -542,10 +728,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Right, false, true, false, Precision::Auto) => {
+            (
+                Alignment::Right,
+                Sign::None,
+                AlternateForm::Activated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ>#w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Right, false, true, false, _) => {
+            (Alignment::Right, Sign::None, AlternateForm::Activated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:ꙮ>#w$.p$}",
@@ -554,10 +746,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Right, false, false, true, Precision::Auto) => {
+            (
+                Alignment::Right,
+                Sign::None,
+                AlternateForm::Deactivated,
+                PadZero::Activated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ>0w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Right, false, false, true, _) => {
+            (Alignment::Right, Sign::None, AlternateForm::Deactivated, PadZero::Activated, _) => {
                 write!(
                     output,
                     "{:ꙮ>0w$.p$}",
@@ -566,10 +764,16 @@ fn write_argument_value(
                     p = precision.unwrap() as usize
                 )
             }
-            (Alignment::Right, false, false, false, Precision::Auto) => {
+            (
+                Alignment::Right,
+                Sign::None,
+                AlternateForm::Deactivated,
+                PadZero::Deactivated,
+                Precision::Auto,
+            ) => {
                 write!(output, "{:ꙮ>w$}", value, w = width.unwrap() as usize)
             }
-            (Alignment::Right, false, false, false, _) => {
+            (Alignment::Right, Sign::None, AlternateForm::Deactivated, PadZero::Deactivated, _) => {
                 write!(
                     output,
                     "{:ꙮ>w$.p$}",

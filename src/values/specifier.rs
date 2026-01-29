@@ -1,7 +1,10 @@
 use core::fmt::Write;
 
 use crate::{
-    values::{Alignment, Precision, Type, Width},
+    values::{
+        Alignment, AlternateForm, PadZero, Precision, Sign, ToAlternateForm, ToPadZero, ToSign,
+        Type, Width,
+    },
     ArgumentKey, Error,
 };
 
@@ -25,11 +28,11 @@ use alloc::string::ToString;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Specifier {
     pub ty: Type,
-    pub alternate_form: bool,
+    pub alternate_form: AlternateForm,
     pub fill_character: char,
     pub alignment: Alignment,
-    pub sign: bool,
-    pub pad_zero: bool,
+    pub sign: Sign,
+    pub pad_zero: PadZero,
     pub width: Width,
     pub precision: Precision,
 }
@@ -63,17 +66,17 @@ impl Specifier {
 
         if let Some(sign) = parse_sign(&chars[current_specifier_index..]) {
             current_specifier_index += 1;
-            specifier.sign = sign;
+            specifier.sign = Sign::of(sign);
         }
 
         if let Some(alternate_form) = parse_alternate_form(&chars[current_specifier_index..]) {
             current_specifier_index += 1;
-            specifier.alternate_form = alternate_form;
+            specifier.alternate_form = AlternateForm::of(alternate_form);
         }
 
         if let Some(pad_zero) = parse_pad_zero(&chars[current_specifier_index..]) {
             current_specifier_index += 1;
-            specifier.pad_zero = pad_zero;
+            specifier.pad_zero = PadZero::of(pad_zero);
         }
 
         if let Some((width, incr_index)) = parse_width(
@@ -117,11 +120,11 @@ impl Specifier {
                 Alignment::Auto => None,
             })
             .sign(match self.sign {
-                true => Some(core::fmt::Sign::Plus),
-                false => None,
+                Sign::Plus => Some(core::fmt::Sign::Plus),
+                Sign::None => None,
             })
-            .sign_aware_zero_pad(self.pad_zero)
-            .alternate(self.alternate_form)
+            .sign_aware_zero_pad(self.pad_zero == PadZero::Activated)
+            .alternate(self.alternate_form == AlternateForm::Activated)
             .width(match self.width {
                 Width::Dynamic(_) => None,
                 Width::Fixed(amount) => Some(amount as u16),
@@ -141,8 +144,8 @@ impl Specifier {
     }
 
     /// Builder to set the alternate form.
-    pub fn alternate_form(mut self, alternate_form: bool) -> Self {
-        self.alternate_form = alternate_form;
+    pub fn alternate_form<K: ToAlternateForm>(mut self, alternate_form: K) -> Self {
+        self.alternate_form = alternate_form.to_alternate_form();
         self
     }
 
@@ -159,14 +162,14 @@ impl Specifier {
     }
 
     /// Builder to set the sign mode.
-    pub fn sign(mut self, sign: bool) -> Self {
-        self.sign = sign;
+    pub fn sign<K: ToSign>(mut self, sign: K) -> Self {
+        self.sign = sign.to_sign();
         self
     }
 
     /// Builder to set the pad zero mode.
-    pub fn pad_zero(mut self, pad_zero: bool) -> Self {
-        self.pad_zero = pad_zero;
+    pub fn pad_zero<K: ToPadZero>(mut self, pad_zero: K) -> Self {
+        self.pad_zero = pad_zero.to_pad_zero();
         self
     }
 
@@ -187,11 +190,11 @@ impl Default for Specifier {
     fn default() -> Self {
         Self {
             ty: Type::Display,
-            alternate_form: false,
+            alternate_form: AlternateForm::Deactivated,
             fill_character: ' ',
             alignment: Alignment::Auto,
-            sign: false,
-            pad_zero: false,
+            sign: Sign::None,
+            pad_zero: PadZero::Deactivated,
             width: Width::Fixed(0),
             precision: Precision::Auto,
         }
@@ -202,13 +205,13 @@ impl core::fmt::Display for Specifier {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(f, "{}", self.fill_character)?;
         write!(f, "{}", self.alignment)?;
-        if self.sign {
+        if self.sign == Sign::Plus {
             f.write_char('+')?;
         }
-        if self.alternate_form {
+        if self.alternate_form == AlternateForm::Activated {
             f.write_char('#')?;
         }
-        if self.pad_zero {
+        if self.pad_zero == PadZero::Activated {
             f.write_char('0')?;
         }
         write!(f, "{}", self.width)?;
