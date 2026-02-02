@@ -33,13 +33,13 @@ pub struct AllowedSpecifier {
 impl AllowedSpecifier {
     pub fn all() -> Self {
         AllowedSpecifier {
-            types: 0b11111111110000,
-            alternate_forms: 0b11000000,
+            types: 0b0000_0011_1111_1111,
+            alternate_forms: 0b0000_0011,
             allowed_fill_characters: None,
             forbidden_fill_characters: None,
-            alignments: 0b11100000,
-            signs: 0b11000000,
-            pad_zeros: 0b11000000,
+            alignments: 0b0000_1111,
+            signs: 0b0000_0011,
+            pad_zeros: 0b0000_0011,
             allowed_widths: None,
             forbidden_widths: None,
             allowed_precisions: None,
@@ -114,7 +114,7 @@ impl AllowedSpecifierBuilder<Type> for AllowedSpecifier {
     }
 
     fn forbid(mut self, constraint: Type) -> Self {
-        self.types &= !(1 << constraint as usize);
+        self.types &= !(1 << constraint as u16);
         self
     }
 }

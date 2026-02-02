@@ -68,6 +68,27 @@ impl Template {
         })
     }
 
+    /// Expects that all arguments meet the specified constraints.
+    pub fn expect_all_arguments_to_meet_constraints(
+        &self,
+        allowed_specifier: &AllowedSpecifier,
+    ) -> Result<&Self, Error> {
+        for piece in self.pieces.iter() {
+            if let Piece::Argument { specifier, key } = piece {
+                let specifier = specifier.clone().unwrap_or_else(Specifier::default);
+                if !allowed_specifier.is_within_constraints(&specifier) {
+                    return Err(Error::ArgumentNotWithinConstraints(
+                        key.clone(),
+                        specifier.clone(),
+                        Box::new(allowed_specifier.clone()),
+                    ));
+                }
+            }
+        }
+
+        Ok(self)
+    }
+
     /// Expect a specified argument within a parsed template
     pub fn expect_argument<K: ToArgumentKey>(
         &self,
@@ -75,23 +96,29 @@ impl Template {
         allowed_specifier: &AllowedSpecifier,
     ) -> Result<&Self, Error> {
         let argument_key = key.to_argument_key();
-        let argument = self
+        let arguments = self
             .pieces
             .iter()
-            .find(|piece| match piece {
+            .filter(|piece| match piece {
                 Piece::Argument { key, .. } => key == &argument_key,
                 _ => false,
             })
-            .ok_or_else(|| Error::ArgumentNotFound(argument_key.clone()))?;
+            .collect::<Vec<_>>();
 
-        if let Piece::Argument { specifier, .. } = argument {
-            let specifier = specifier.clone().unwrap_or_else(Specifier::default);
-            if !allowed_specifier.is_within_constraints(&specifier) {
-                return Err(Error::ArgumentNotWithinConstraints(
-                    argument_key,
-                    specifier.clone(),
-                    Box::new(allowed_specifier.clone()),
-                ));
+        if arguments.is_empty() {
+            return Err(Error::ArgumentNotFound(argument_key));
+        }
+
+        for argument in arguments {
+            if let Piece::Argument { specifier, .. } = argument {
+                let specifier = specifier.clone().unwrap_or_else(Specifier::default);
+                if !allowed_specifier.is_within_constraints(&specifier) {
+                    return Err(Error::ArgumentNotWithinConstraints(
+                        argument_key,
+                        specifier.clone(),
+                        Box::new(allowed_specifier.clone()),
+                    ));
+                }
             }
         }
 

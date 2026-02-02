@@ -45,10 +45,17 @@ fn expect_argument_argument_not_within_constraints2() {
 }
 
 #[test]
-fn debug() {
+fn expect_argument_consider_all_arguments() {
     let allowed_specifier = AllowedSpecifier::all().forbid(Type::Display);
-    assert!(Template::parse("Hello, {world}!")
-        .unwrap()
-        .expect_argument("world", &allowed_specifier)
+    let result = Template::parse("Hello, {world:?} {world}!").unwrap();
+    assert!(result.expect_argument("world", &allowed_specifier).is_err());
+}
+
+#[test]
+fn expect_all_arguments_to_meet_constraints() {
+    let allowed_specifier = AllowedSpecifier::all().forbid(Type::Display);
+    let result = Template::parse("Hello, {0:?} {world}!").unwrap();
+    assert!(result
+        .expect_all_arguments_to_meet_constraints(&allowed_specifier)
         .is_err());
 }
