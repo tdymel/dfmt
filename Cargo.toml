@@ -37,6 +37,10 @@ path = "benches/performance.rs"
 name = "dformat"
 path = "benches/dformat.rs"
 
+[[bench]]
+name = "potential"
+path = "benches/potential.rs"
+
 [features]
 nightly_formatting_options = []
 std = []
